@@ -1,0 +1,1 @@
+require 'symgate/auth/client'
