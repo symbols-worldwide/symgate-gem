@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+        xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:ns1="http://ws.widgit.com/schema/globaltypes/1.2"
+        xmlns:wl1x1="http://www.symgate.com/wordlist"
+        xmlns:cml2="http://ws.widgit.com/schema/cml/2.0"
+        xmlns:wl1x2="http://ws.widgit.com/schema/wordlist/1.2"
+        xmlns:auth="http://ws.widgit.com/schema/auth/1.2"
+        xmlns:cml1="http://www.symgate.com/cml"
+        xmlns:bridge="http://ws.widgit.com/schema/bridge/1.2"
+        xmlns:symboliser1x1="http://www.symgate.com/symgate"
+        xmlns:symboliser1x2="http://ws.widgit.com/schema/symboliser/1.2">
+  <SOAP-ENV:Body>
+    <symboliser1x2:destroyUserResponse></symboliser1x2:destroyUserResponse>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

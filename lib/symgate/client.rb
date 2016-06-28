@@ -11,7 +11,8 @@ module Symgate
 
     # Constructs a new client with the provided options
     def initialize(opts = {})
-      @wsdl = 'https://ws.widgit.com/schema/symboliser.wsdl'
+      @wsdl = 'https://ws.widgitonline.com/schema/symboliser.wsdl'
+      @endpoint = 'https://ws.widgitonline.com/symboliser/'
       opts.each { |k, v| instance_variable_set("@#{k}", v) }
 
       validate_client_options
