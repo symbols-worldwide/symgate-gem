@@ -65,5 +65,17 @@ module Symgate
 
       user
     end
+
+    # sends a request to the server and yields a soap block for defining the
+    # message body
+    def savon_request(method)
+      @savon_client.call(method) do |soap|
+        yield soap if block_given?
+        soap.message({}) if soap[:message].nil?
+        soap[:message].merge!(savon_creds)
+      end
+    rescue Savon::SOAPFault => e
+      raise Symgate::Error.from_savon(e)
+    end
   end
 end

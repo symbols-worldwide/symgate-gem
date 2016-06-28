@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wl="http://www.symgate.com/wordlist"
+                   xmlns:cml="http://www.symgate.com/cml" xmlns:bubblewrap="http://activation.widgit.com/activator"
+                   xmlns:symboliser="http://www.symgate.com/symgate/symbolisationBinding"
+                   xmlns:symgate="http://www.symgate.com/symgate"
+                   xmlns:wordlistmanager="http://www.symgate.com/symgate/wordlistManagerBinding">
+  <SOAP-ENV:Body>
+    <SOAP-ENV:Fault>
+      <faultcode>SOAP-ENV:Client</faultcode>
+      <faultstring>Access denied</faultstring>
+    </SOAP-ENV:Fault>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

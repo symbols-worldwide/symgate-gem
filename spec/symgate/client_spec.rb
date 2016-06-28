@@ -92,4 +92,27 @@ RSpec.describe(Symgate::Client) do
                                        })
     end
   end
+
+  describe '#savon_request' do
+    before(:each) do
+      Symgate::Client.send(:public, :savon_request)
+    end
+
+    it 'fails when an unknown method is called' do
+      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      expect { client.savon_request(:make_pancakes) }.to raise_error(Savon::UnknownOperationError)
+    end
+
+    it 'returns access denied when called with incorrect credentials' do
+      savon.expects(:enumerate_groups)
+           .with(message: { 'auth:account': 'foo', 'auth:key': 'bar' })
+           .returns(File.read('spec/fixtures/xml/access_denied.xml'))
+
+      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      expect { |b| client.savon_request(:enumerate_groups, &b) }.to raise_error do |e|
+        expect(e).to be_a(Symgate::Error)
+        expect(e.message).to include('Access denied')
+      end
+    end
+  end
 end
