@@ -18,6 +18,17 @@ module Symgate
       create_savon_client
     end
 
+    # returns an array from 0 or more items when an array is expected.
+    # (savon returns a single value for things that can be a sequence of multiple objects)
+    # expects a hash, and a key for the array within that hash
+    def self.savon_array(hash, key)
+      if hash && hash.include?(key)
+        [hash[key]].flatten
+      else
+        []
+      end
+    end
+
     protected
 
     # ensures enough information has been passed to the client

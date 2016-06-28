@@ -115,4 +115,18 @@ RSpec.describe(Symgate::Client) do
       end
     end
   end
+
+  describe '#savon_array' do
+    it 'returns an empty array when the hash does not contain the key' do
+      expect(Symgate::Client.savon_array({ bar: 'foo' }, :foo)).to match_array([])
+    end
+
+    it 'returns an array with one item when the hash item is a non-array' do
+      expect(Symgate::Client.savon_array({ foo: 'bar' }, :foo)).to match_array(%w(bar))
+    end
+
+    it 'returns an array with multiple items when the hash item is an array' do
+      expect(Symgate::Client.savon_array({ foo: %w(bar baz) }, :foo)).to match_array(%w(bar baz))
+    end
+  end
 end
