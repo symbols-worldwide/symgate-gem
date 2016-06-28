@@ -62,4 +62,34 @@ RSpec.describe(Symgate::Client) do
       expect(client.savon_client).to be_a(Savon::Client)
     end
   end
+
+  describe '#savon_creds' do
+    before(:each) do
+      Symgate::Client.send(:public, :savon_creds)
+    end
+
+    it 'returns a hash' do
+      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      expect(client.savon_creds).to be_a(Hash)
+    end
+
+    it 'adds the account and key to the hash, when specified' do
+      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      expect(client.savon_creds).to eq('auth:account': 'foo', 'auth:key': 'bar')
+    end
+
+    it 'adds the user and password to the hash, when specified' do
+      client = Symgate::Client.new(account: 'foo', user: 'bar', password: 'baz')
+      expect(client.savon_creds).to eq('auth:account': 'foo', 'auth:user': {
+                                         'auth:id': 'bar', 'auth:password': 'baz'
+                                       })
+    end
+
+    it 'adds the user and token to the hash, when specified' do
+      client = Symgate::Client.new(account: 'foo', user: 'bar', token: 'baz')
+      expect(client.savon_creds).to eq('auth:account': 'foo', 'auth:user': {
+                                         'auth:id': 'bar', 'auth:authtoken': 'baz'
+                                       })
+    end
+  end
 end
