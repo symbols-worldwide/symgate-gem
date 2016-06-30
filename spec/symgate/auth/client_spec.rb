@@ -167,7 +167,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               userid: 'group/baz',
                               password: 'frob' })
-             .returns(File.read('spec/fixtures/xml/set_user_password.xml'))
+             .returns(File.read('spec/fixtures/xml/destroy_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.set_user_password('group/baz', 'frob') }.not_to raise_error
@@ -184,6 +184,210 @@ RSpec.describe(Symgate::Auth::Client) do
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.destroy_user('group/baz') }.not_to raise_error
+      end
+    end
+
+    describe '#authenticate' do
+      it 'authenticates and returns a token with normal auth' do
+        savon.expects(:authenticate)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/baz', 'auth:password': 'frob' } })
+             .returns(File.read('spec/fixtures/xml/authenticate.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
+        token = nil
+        expect { token = client.authenticate }.not_to raise_error
+        expect(token).to eq('bananana')
+      end
+
+      it 'authenticates and returns a token with impersonation' do
+        savon.expects(:authenticate)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              userid: 'group/baz' })
+             .returns(File.read('spec/fixtures/xml/authenticate.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        token = nil
+        expect { token = client.authenticate('group/baz') }.not_to raise_error
+        expect(token).to eq('bananana')
+      end
+    end
+
+    describe '#add_group_language' do
+      it 'successfully adds a new group language' do
+        savon.expects(:add_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'Swedish' })
+             .returns(File.read('spec/fixtures/xml/add_group_language.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        response = nil
+        expect { response = client.add_group_language('baz', 'Swedish') }.not_to raise_error
+        expect(response).to eq('OK')
+      end
+
+      it 'returns Exists if a language already exists' do
+        savon.expects(:add_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'English_UK' })
+             .returns(File.read('spec/fixtures/xml/add_group_language_exists.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        response = nil
+        expect { response = client.add_group_language('baz', 'English_UK') }.not_to raise_error
+        expect(response).to eq('Exists')
+      end
+    end
+
+    describe '#remove_group_language' do
+      it 'successfully removes the language from the group' do
+        savon.expects(:remove_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'English_UK' })
+             .returns(File.read('spec/fixtures/xml/remove_group_language.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        response = nil
+        expect { response = client.remove_group_language('baz', 'English_UK') }.not_to raise_error
+        expect(response).to eq('OK')
+      end
+
+      it 'returns NotExist if a language is not present' do
+        savon.expects(:remove_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'Swedish' })
+             .returns(File.read('spec/fixtures/xml/remove_group_language_not_exist.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        response = nil
+        expect { response = client.remove_group_language('baz', 'Swedish') }.not_to raise_error
+        expect(response).to eq('NotExist')
+      end
+    end
+
+    describe '#enumerate_group_languages' do
+      it 'returns an empty array when there are no languages' do
+        savon.expects(:enumerate_group_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz' })
+             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_empty.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        expect(client.enumerate_group_languages('baz')).to match_array([])
+      end
+
+      it 'returns an empty array when there are no languages' do
+        savon.expects(:enumerate_group_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz' })
+             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_one.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        expect(client.enumerate_group_languages('baz')).to match_array(['English_UK'])
+      end
+
+      it 'returns an array containing two items when there are two languages' do
+        savon.expects(:enumerate_group_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz' })
+             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_two.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        expect(client.enumerate_group_languages('baz')).to match_array(%w(English_UK Swedish))
+      end
+    end
+
+    describe '#query_group_language' do
+      it 'returns true if the language is present' do
+        savon.expects(:query_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'English_UK' })
+             .returns(File.read('spec/fixtures/xml/query_group_language_true.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        expect(client.query_group_language('baz', 'English_UK')).to be_truthy
+      end
+
+      it 'returns false if the language is not present' do
+        savon.expects(:query_group_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:key': 'bar',
+                              groupid: 'baz',
+                              language: 'Swedish' })
+             .returns(File.read('spec/fixtures/xml/query_group_language_false.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+        expect(client.query_group_language('baz', 'Swedish')).to be_falsey
+      end
+    end
+
+    describe '#enumerate_languages' do
+      it 'returns an empty array when there are no languages' do
+        savon.expects(:enumerate_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
+             .returns(File.read('spec/fixtures/xml/enumerate_languages_empty.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+        expect(client.enumerate_languages).to match_array([])
+      end
+
+      it 'returns an empty array when there are no languages' do
+        savon.expects(:enumerate_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
+             .returns(File.read('spec/fixtures/xml/enumerate_languages_one.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+        expect(client.enumerate_languages).to match_array(['English_UK'])
+      end
+
+      it 'returns an array containing two items when there are two languages' do
+        savon.expects(:enumerate_languages)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
+             .returns(File.read('spec/fixtures/xml/enumerate_languages_two.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+        expect(client.enumerate_languages).to match_array(%w(English_UK Swedish))
+      end
+    end
+
+    describe '#query_language' do
+      it 'returns true if the language is present' do
+        savon.expects(:query_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' },
+                              language: 'English_UK' })
+             .returns(File.read('spec/fixtures/xml/query_language_true.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+        expect(client.query_language('English_UK')).to be_truthy
+      end
+
+      it 'returns false if the language is not present' do
+        savon.expects(:query_language)
+             .with(message: { 'auth:account': 'foo',
+                              'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' },
+                              language: 'Swedish' })
+             .returns(File.read('spec/fixtures/xml/query_language_false.xml'))
+
+        client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+        expect(client.query_language('Swedish')).to be_falsey
       end
     end
   end
