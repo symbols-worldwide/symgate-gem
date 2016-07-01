@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.41.1'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
   spec.add_development_dependency 'rubocop-junit-formatter', '~> 0.1.3'
+  spec.add_development_dependency 'rack', '~> 1.6.4'
 
   spec.add_dependency 'savon', '~> 2.11.0'
 end
