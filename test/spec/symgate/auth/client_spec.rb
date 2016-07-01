@@ -7,7 +7,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an empty array if there are no groups' do
       savon.expects(:enumerate_groups)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar' })
-           .returns(File.read('spec/fixtures/xml/enumerate_groups_empty.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array([])
@@ -16,7 +16,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an array with one item if there is one group' do
       savon.expects(:enumerate_groups)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar' })
-           .returns(File.read('spec/fixtures/xml/enumerate_groups_one.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array(%w(one))
@@ -25,7 +25,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an array with two items if there are two groups' do
       savon.expects(:enumerate_groups)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar' })
-           .returns(File.read('spec/fixtures/xml/enumerate_groups_two.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array(%w(one two))
@@ -36,7 +36,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns a valid response when creating a group' do
       savon.expects(:create_group)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar', groupid: 'baz' })
-           .returns(File.read('spec/fixtures/xml/create_group.xml'))
+           .returns(File.read('test/spec/fixtures/xml/create_group.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect { client.create_group('baz') }.not_to raise_error
@@ -47,7 +47,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns a valid response when destroying a group' do
       savon.expects(:destroy_group)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar', groupid: 'baz' })
-           .returns(File.read('spec/fixtures/xml/destroy_group.xml'))
+           .returns(File.read('test/spec/fixtures/xml/destroy_group.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect { client.destroy_group('baz') }.not_to raise_error
@@ -61,7 +61,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             'auth:key': 'bar',
                             old_groupid: 'baz',
                             new_groupid: 'turlingdrome' })
-           .returns(File.read('spec/fixtures/xml/rename_group.xml'))
+           .returns(File.read('test/spec/fixtures/xml/rename_group.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect { client.rename_group('baz', 'turlingdrome') }.not_to raise_error
@@ -72,7 +72,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an empty array if there are no users' do
       savon.expects(:enumerate_users)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar', groupid: 'baz' })
-           .returns(File.read('spec/fixtures/xml/enumerate_users_empty.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_users_empty.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz')).to match_array([])
@@ -81,7 +81,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an array with a single user if there is one user' do
       savon.expects(:enumerate_users)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar', groupid: 'baz' })
-           .returns(File.read('spec/fixtures/xml/enumerate_users_one.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_users_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz'))
@@ -91,7 +91,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'returns an array with a two users if there are two users' do
       savon.expects(:enumerate_users)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar', groupid: 'baz' })
-           .returns(File.read('spec/fixtures/xml/enumerate_users_two.xml'))
+           .returns(File.read('test/spec/fixtures/xml/enumerate_users_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz'))
@@ -109,7 +109,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:user': '',
                               attributes!: { 'auth:user': { id: 'baz' } },
                               password: 'frob' })
-             .returns(File.read('spec/fixtures/xml/create_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/create_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         user = Symgate::Auth::User.new(user_id: 'baz')
@@ -124,7 +124,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               'auth:user': '',
                               attributes!: { 'auth:user': { id: 'baz', isGroupAdmin: true } } })
-             .returns(File.read('spec/fixtures/xml/update_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/update_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         user = Symgate::Auth::User.new(user_id: 'baz', is_group_admin: true)
@@ -139,7 +139,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               old_user_id: 'group/baz',
                               new_user_id: 'group/frob' })
-             .returns(File.read('spec/fixtures/xml/rename_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.rename_user('group/baz', 'group/frob') }.not_to raise_error
@@ -153,7 +153,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               old_user_id: 'group/baz',
                               new_user_id: 'frob/baz' })
-             .returns(File.read('spec/fixtures/xml/rename_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.move_user('group/baz', 'frob/baz') }.not_to raise_error
@@ -167,7 +167,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               userid: 'group/baz',
                               password: 'frob' })
-             .returns(File.read('spec/fixtures/xml/destroy_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.set_user_password('group/baz', 'frob') }.not_to raise_error
@@ -180,7 +180,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:key': 'bar',
                               userid: 'group/baz' })
-             .returns(File.read('spec/fixtures/xml/destroy_user.xml'))
+             .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect { client.destroy_user('group/baz') }.not_to raise_error
@@ -192,7 +192,7 @@ RSpec.describe(Symgate::Auth::Client) do
         savon.expects(:authenticate)
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/baz', 'auth:password': 'frob' } })
-             .returns(File.read('spec/fixtures/xml/authenticate.xml'))
+             .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
         token = nil
@@ -205,7 +205,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:key': 'bar',
                               userid: 'group/baz' })
-             .returns(File.read('spec/fixtures/xml/authenticate.xml'))
+             .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         token = nil
@@ -221,7 +221,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'Swedish' })
-             .returns(File.read('spec/fixtures/xml/add_group_language.xml'))
+             .returns(File.read('test/spec/fixtures/xml/add_group_language.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         response = nil
@@ -235,7 +235,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'English_UK' })
-             .returns(File.read('spec/fixtures/xml/add_group_language_exists.xml'))
+             .returns(File.read('test/spec/fixtures/xml/add_group_language_exists.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         response = nil
@@ -251,7 +251,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'English_UK' })
-             .returns(File.read('spec/fixtures/xml/remove_group_language.xml'))
+             .returns(File.read('test/spec/fixtures/xml/remove_group_language.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         response = nil
@@ -265,7 +265,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'Swedish' })
-             .returns(File.read('spec/fixtures/xml/remove_group_language_not_exist.xml'))
+             .returns(File.read('test/spec/fixtures/xml/remove_group_language_not_exist.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         response = nil
@@ -280,7 +280,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:key': 'bar',
                               groupid: 'baz' })
-             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_empty.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_empty.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect(client.enumerate_group_languages('baz')).to match_array([])
@@ -291,7 +291,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:key': 'bar',
                               groupid: 'baz' })
-             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_one.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_one.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect(client.enumerate_group_languages('baz')).to match_array(['English_UK'])
@@ -302,7 +302,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:key': 'bar',
                               groupid: 'baz' })
-             .returns(File.read('spec/fixtures/xml/enumerate_group_languages_two.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_two.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect(client.enumerate_group_languages('baz')).to match_array(%w(English_UK Swedish))
@@ -316,7 +316,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'English_UK' })
-             .returns(File.read('spec/fixtures/xml/query_group_language_true.xml'))
+             .returns(File.read('test/spec/fixtures/xml/query_group_language_true.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect(client.query_group_language('baz', 'English_UK')).to be_truthy
@@ -328,7 +328,7 @@ RSpec.describe(Symgate::Auth::Client) do
                               'auth:key': 'bar',
                               groupid: 'baz',
                               language: 'Swedish' })
-             .returns(File.read('spec/fixtures/xml/query_group_language_false.xml'))
+             .returns(File.read('test/spec/fixtures/xml/query_group_language_false.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
         expect(client.query_group_language('baz', 'Swedish')).to be_falsey
@@ -340,7 +340,7 @@ RSpec.describe(Symgate::Auth::Client) do
         savon.expects(:enumerate_languages)
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
-             .returns(File.read('spec/fixtures/xml/enumerate_languages_empty.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_languages_empty.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
         expect(client.enumerate_languages).to match_array([])
@@ -350,7 +350,7 @@ RSpec.describe(Symgate::Auth::Client) do
         savon.expects(:enumerate_languages)
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
-             .returns(File.read('spec/fixtures/xml/enumerate_languages_one.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_languages_one.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
         expect(client.enumerate_languages).to match_array(['English_UK'])
@@ -360,7 +360,7 @@ RSpec.describe(Symgate::Auth::Client) do
         savon.expects(:enumerate_languages)
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' } })
-             .returns(File.read('spec/fixtures/xml/enumerate_languages_two.xml'))
+             .returns(File.read('test/spec/fixtures/xml/enumerate_languages_two.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
         expect(client.enumerate_languages).to match_array(%w(English_UK Swedish))
@@ -373,7 +373,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' },
                               language: 'English_UK' })
-             .returns(File.read('spec/fixtures/xml/query_language_true.xml'))
+             .returns(File.read('test/spec/fixtures/xml/query_language_true.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
         expect(client.query_language('English_UK')).to be_truthy
@@ -384,7 +384,7 @@ RSpec.describe(Symgate::Auth::Client) do
              .with(message: { 'auth:account': 'foo',
                               'auth:user': { 'auth:id': 'group/bar', 'auth:password': 'baz' },
                               language: 'Swedish' })
-             .returns(File.read('spec/fixtures/xml/query_language_false.xml'))
+             .returns(File.read('test/spec/fixtures/xml/query_language_false.xml'))
 
         client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
         expect(client.query_language('Swedish')).to be_falsey

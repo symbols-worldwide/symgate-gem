@@ -106,7 +106,7 @@ RSpec.describe(Symgate::Client) do
     it 'returns access denied when called with incorrect credentials' do
       savon.expects(:enumerate_groups)
            .with(message: { 'auth:account': 'foo', 'auth:key': 'bar' })
-           .returns(File.read('spec/fixtures/xml/access_denied.xml'))
+           .returns(File.read('test/spec/fixtures/xml/access_denied.xml'))
 
       client = Symgate::Client.new(account: 'foo', key: 'bar')
       expect { |b| client.savon_request(:enumerate_groups, &b) }.to raise_error do |e|
