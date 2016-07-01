@@ -1,11 +1,14 @@
 require 'bundler/gem_tasks'
 begin
   require 'rspec/core/rake_task'
-  RSpec::Core::RakeTask.new(:spec)
+  RSpec::Core::RakeTask.new(:spec) do |spec|
+    spec.pattern = 'test/spec/**/*_spec.rb'
+  end
 
   desc 'Run RSpec code examples with junit output'
   RSpec::Core::RakeTask.new('teamcity:spec') do |spec|
     spec.rspec_opts = '-f RspecJunitFormatter -o .junit/rspec.xml'
+    spec.pattern = 'test/spec/**/*_spec.rb'
   end
 rescue LoadError
   $stderr.puts 'Unable to find rspec gem'
@@ -29,4 +32,8 @@ namespace :teamcity do
 
   desc 'Run all tests with junit output'
   task test: [:rubocop, :spec]
+end
+
+namespace :test do
+  task teamcity: 'teamcity:test'
 end
