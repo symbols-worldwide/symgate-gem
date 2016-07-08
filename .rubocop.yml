@@ -1,5 +1,15 @@
+AllCops:
+  TargetRubyVersion: 2.2.1
+  Exclude:
+    - 'vendor/**/*'
+    - '.chef/**/*'
+    - 'local-mode-cache/**/*'
+
 Metrics/LineLength:
   Max: 100
 
-AllCops:
-  TargetRubyVersion: 2.2.1
+Metrics/MethodLength:
+  Max: 12
+
+Style/NumericLiterals:
+  Enabled: false

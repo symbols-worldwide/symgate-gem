@@ -9,3 +9,8 @@
 /tmp/
 /.junit/*.xml
 /.idea/
+/.chef/
+/local-mode-cache/
+/nodes/
+/.vagrant/
+/Berksfile.lock
