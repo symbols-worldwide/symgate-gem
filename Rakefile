@@ -4,11 +4,21 @@ begin
   RSpec::Core::RakeTask.new(:spec) do |spec|
     spec.pattern = 'test/spec/**/*_spec.rb'
   end
+  desc 'Run RSpec integration tests against vagrant symboliser'
+  RSpec::Core::RakeTask.new('spec:integration') do |spec|
+    spec.pattern = 'test/integration/**/*_spec.rb'
+  end
 
   desc 'Run RSpec code examples with junit output'
   RSpec::Core::RakeTask.new('teamcity:spec') do |spec|
     spec.rspec_opts = '-f RspecJunitFormatter -o .junit/rspec.xml'
     spec.pattern = 'test/spec/**/*_spec.rb'
+  end
+
+  desc 'Run RSpec integration tests against vagrant symboliser with junit output'
+  RSpec::Core::RakeTask.new('teamcity:spec:integration') do |spec|
+    spec.rspec_opts = '-f RspecJunitFormatter -o .junit/rspec.xml'
+    spec.pattern = 'test/integration/**/*_spec.rb'
   end
 rescue LoadError
   $stderr.puts 'Unable to find rspec gem'

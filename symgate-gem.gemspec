@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-junit-formatter', '~> 0.1.3'
   spec.add_development_dependency 'rack', '~> 1.6.4'
   spec.add_development_dependency 'berkshelf', '~> 4.3.5'
+  spec.add_development_dependency 'mysql2', '~> 0.4.1'
 
   spec.add_dependency 'savon', '~> 2.11.0'
 end
