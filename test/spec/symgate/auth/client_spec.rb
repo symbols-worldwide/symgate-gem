@@ -72,7 +72,8 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_users' do
     it 'returns an empty array if there are no users' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' }, groupid: 'baz' })
+           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' },
+                            groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_empty.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -81,7 +82,8 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with a single user if there is one user' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' }, groupid: 'baz' })
+           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' },
+                            groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -91,7 +93,8 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with a two users if there are two users' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' }, groupid: 'baz' })
+           .with(message: { 'auth:creds': { 'auth:account': 'foo', 'auth:key': 'bar' },
+                            groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')

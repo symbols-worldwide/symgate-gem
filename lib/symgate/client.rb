@@ -56,7 +56,7 @@ module Symgate
     end
 
     def create_savon_client
-      @savon_client = Savon.client(savon_opts.merge({ wsdl: @wsdl, endpoint: @endpoint })) do
+      @savon_client = Savon.client(savon_opts.merge(wsdl: @wsdl, endpoint: @endpoint)) do
         endpoint(@endpoint) if @endpoint
         namespaces(Symgate::NAMESPACES)
       end
@@ -68,7 +68,7 @@ module Symgate
       creds[:'auth:key'] = @key if @key
       creds[:'auth:user'] = savon_user if @user
 
-      {'auth:creds': creds }
+      { 'auth:creds': creds }
     end
 
     def savon_user

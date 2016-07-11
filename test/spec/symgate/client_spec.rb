@@ -80,16 +80,18 @@ RSpec.describe(Symgate::Client) do
 
     it 'adds the user and password to the hash, when specified' do
       client = Symgate::Client.new(account: 'foo', user: 'bar', password: 'baz')
-      expect(client.savon_creds).to eq('auth:creds': { 'auth:account': 'foo', 'auth:user': {
+      expect(client.savon_creds).to eq('auth:creds': { 'auth:account': 'foo',
+                                                       'auth:user': {
                                                          'auth:id': 'bar', 'auth:password': 'baz'
-                                                     } })
+                                                       } })
     end
 
     it 'adds the user and token to the hash, when specified' do
       client = Symgate::Client.new(account: 'foo', user: 'bar', token: 'baz')
-      expect(client.savon_creds).to eq('auth:creds': { 'auth:account': 'foo', 'auth:user': {
-                                                       'auth:id': 'bar', 'auth:authtoken': 'baz'
-                                                     } })
+      expect(client.savon_creds).to eq('auth:creds': { 'auth:account': 'foo',
+                                                       'auth:user': {
+                                                         'auth:id': 'bar', 'auth:authtoken': 'baz'
+                                                       } })
     end
   end
 

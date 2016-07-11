@@ -11,7 +11,7 @@ def integration_mysql_client
 end
 
 def savon_opts
-  {log: true, log_level: :debug, pretty_print_xml: true}
+  { log: true, log_level: :debug, pretty_print_xml: true }
 end
 
 RSpec.configure do |config|
