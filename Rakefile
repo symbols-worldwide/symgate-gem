@@ -41,7 +41,7 @@ namespace :teamcity do
   end
 
   desc 'Run all tests with junit output'
-  task test: [:rubocop, :spec]
+  task test: [:rubocop, :spec, :integration]
 end
 
 namespace :test do
