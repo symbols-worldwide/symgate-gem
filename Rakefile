@@ -47,3 +47,20 @@ end
 namespace :test do
   task teamcity: 'teamcity:test'
 end
+
+namespace :vagrant do
+  desc 'Boot the symboliser virtual machine'
+  task :up do
+    system 'cd symboliser-vagrant && vagrant up'
+  end
+
+  desc 'Destroy the symboliser virtual machine'
+  task :destroy do
+    system 'cd symboliser-vagrant && vagrant destroy --force'
+  end
+
+  desc 'Halt the symboliser virtual machine for later use'
+  task :halt do
+    system 'cd symboliser-vagrant && vagrant halt --force'
+  end
+end

@@ -4,6 +4,7 @@ AllCops:
     - 'vendor/**/*'
     - '.chef/**/*'
     - 'local-mode-cache/**/*'
+    - 'symboliser-vagrant/**/*'
 
 Metrics/LineLength:
   Max: 100
