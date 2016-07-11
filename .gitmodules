@@ -1,0 +1,3 @@
+[submodule "symboliser-vagrant"]
+	path = symboliser-vagrant
+	url = https://git.widgit.com/scm/online/symboliser-vagrant.git
