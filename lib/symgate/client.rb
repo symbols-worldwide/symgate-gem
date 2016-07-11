@@ -6,13 +6,14 @@ module Symgate
   # A generic client for the Symgate API.
   # See the WSDL for full documentation
   class Client
-    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key
+    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key, :savon_opts
     attr_reader :savon_client
 
     # Constructs a new client with the provided options
     def initialize(opts = {})
       @wsdl = 'https://ws.widgitonline.com/schema/symboliser.wsdl'
-      @endpoint = 'https://ws.widgitonline.com/symboliser/'
+      @endpoint = 'https://ws.widgitonline.com/'
+      @savon_opts = {}
       opts.each { |k, v| instance_variable_set("@#{k}", v) }
 
       validate_client_options
@@ -55,7 +56,7 @@ module Symgate
     end
 
     def create_savon_client
-      @savon_client = Savon.client(wsdl: @wsdl) do
+      @savon_client = Savon.client(savon_opts.merge({ wsdl: @wsdl, endpoint: @endpoint })) do
         endpoint(@endpoint) if @endpoint
         namespaces(Symgate::NAMESPACES)
       end
@@ -67,7 +68,7 @@ module Symgate
       creds[:'auth:key'] = @key if @key
       creds[:'auth:user'] = savon_user if @user
 
-      creds
+      {'auth:creds': creds }
     end
 
     def savon_user
