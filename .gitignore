@@ -14,3 +14,4 @@
 /nodes/
 /.vagrant/
 /Berksfile.lock
+/vendor/

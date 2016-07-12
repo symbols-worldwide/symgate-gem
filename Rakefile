@@ -17,7 +17,7 @@ begin
 
   desc 'Run RSpec integration tests against vagrant symboliser with junit output'
   RSpec::Core::RakeTask.new('teamcity:spec:integration') do |spec|
-    spec.rspec_opts = '-f RspecJunitFormatter -o .junit/rspec.xml'
+    spec.rspec_opts = '-f RspecJunitFormatter -o .junit/integration.xml'
     spec.pattern = 'test/integration/**/*_spec.rb'
   end
 rescue LoadError
@@ -51,16 +51,24 @@ end
 namespace :vagrant do
   desc 'Boot the symboliser virtual machine'
   task :up do
-    system 'cd symboliser-vagrant && vagrant up'
+    Bundler.with_clean_env do
+      system 'bundle install --path vendor/bundle', chdir: 'symboliser-vagrant'
+      system 'RUBYLIB= NOEXEC_DISABLE=1 vagrant up',
+             chdir: 'symboliser-vagrant'
+    end
   end
 
   desc 'Destroy the symboliser virtual machine'
   task :destroy do
-    system 'cd symboliser-vagrant && vagrant destroy --force'
+    Bundler.with_clean_env do
+      system 'RUBYLIB= NOEXEC_DISABLE=1 vagrant destroy --force',
+             chdir: 'symboliser-vagrant'
+    end
   end
 
   desc 'Halt the symboliser virtual machine for later use'
   task :halt do
-    system 'cd symboliser-vagrant && vagrant halt --force'
+    system 'RUBYLIB= NOEXEC_DISABLE=1 vagrant halt --force',
+           chdir: 'symboliser-vagrant'
   end
 end
