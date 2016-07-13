@@ -15,17 +15,21 @@ module Symgate
 
       # creates a new group
       def create_group(group_id)
-        savon_request(:create_group) { |soap| soap.message(groupid: group_id) }
+        savon_request(:create_group, returns_error_string: true) do |soap|
+          soap.message(groupid: group_id)
+        end
       end
 
       # destroys an existing group
       def destroy_group(group_id)
-        savon_request(:destroy_group) { |soap| soap.message(groupid: group_id) }
+        savon_request(:destroy_group, returns_error_string: true) do |soap|
+          soap.message(groupid: group_id)
+        end
       end
 
       # renames a group
       def rename_group(old_group_id, new_group_id)
-        savon_request(:rename_group) do |soap|
+        savon_request(:rename_group, returns_error_string: true) do |soap|
           soap.message(old_groupid: old_group_id, new_groupid: new_group_id)
         end
       end
@@ -42,7 +46,7 @@ module Symgate
 
       # creates a new user from a Symgate::Auth::User, with the specified password
       def create_user(user, password)
-        savon_request(:create_user) do |soap|
+        savon_request(:create_user, returns_error_string: true) do |soap|
           soap.message(password: password)
           user.to_soap(soap[:message])
         end
@@ -50,7 +54,7 @@ module Symgate
 
       # updates a user (sets the is_group_admin member)
       def update_user(user)
-        savon_request(:update_user) do |soap|
+        savon_request(:update_user, returns_error_string: true) do |soap|
           soap.message({})
           user.to_soap(soap[:message])
         end
@@ -58,28 +62,30 @@ module Symgate
 
       # renames a user (must be within the same group)
       def rename_user(old_user_id, new_user_id)
-        savon_request(:rename_user) do |soap|
+        savon_request(:rename_user, returns_error_string: true) do |soap|
           soap.message(old_user_id: old_user_id, new_user_id: new_user_id)
         end
       end
 
       # moves a user between groups
       def move_user(old_user_id, new_user_id)
-        savon_request(:move_user) do |soap|
+        savon_request(:move_user, returns_error_string: true) do |soap|
           soap.message(old_user_id: old_user_id, new_user_id: new_user_id)
         end
       end
 
       # sets the password for a user
       def set_user_password(user_id, password)
-        savon_request(:set_user_password) do |soap|
+        savon_request(:set_user_password, returns_error_string: true) do |soap|
           soap.message(userid: user_id, password: password)
         end
       end
 
       # destroys a user
       def destroy_user(user_id)
-        savon_request(:destroy_user) { |soap| soap.message(userid: user_id) }
+        savon_request(:destroy_user, returns_error_string: true) do |soap|
+          soap.message(userid: user_id)
+        end
       end
 
       # authenticates a user and returns a token, optionally with a user to impersonate

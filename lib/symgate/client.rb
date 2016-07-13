@@ -81,14 +81,22 @@ module Symgate
 
     # sends a request to the server and yields a soap block for defining the
     # message body
-    def savon_request(method)
-      @savon_client.call(method) do |soap|
+    def savon_request(method, opts = {})
+      r = @savon_client.call(method) do |soap|
         yield soap if block_given?
         soap.message({}) if soap[:message].nil?
         soap[:message].merge!(savon_creds)
       end
+
+      raise_error_on_string_response(r, "#{method}_response".to_sym) if opts[:returns_error_string]
+      r
     rescue Savon::SOAPFault => e
       raise Symgate::Error.from_savon(e)
+    end
+
+    def raise_error_on_string_response(response, response_type)
+      e = response.body[response_type]
+      raise Symgate::Error, e unless e.to_s == ''
     end
   end
 end
