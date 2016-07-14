@@ -96,4 +96,42 @@ RSpec.describe(Symgate::Auth::Client) do
       expect { client.rename_group('foo', 'bar/baz') }.to raise_error(Symgate::Error)
     end
   end
+
+  describe '#enumerate_users' do
+    # currently a bug in upstream, see SOS-201
+    # it 'raises an error for an invalid group' do
+    #   client = account_key_client
+    #
+    #   expect { client.enumerate_users('foo') }.to raise_error(Symgate::Error)
+    # end
+
+    it 'returns an empty array if there are no users' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([])
+    end
+
+    it 'returns an array with a single user if there is one user' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'password') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+    end
+
+    it 'returns an array with multiple users if there are multiple users' do
+      client = account_key_client
+      users = [
+        Symgate::Auth::User.new(user_id: 'foo/bar'),
+        Symgate::Auth::User.new(user_id: 'foo/baz'),
+        Symgate::Auth::User.new(user_id: 'foo/qux', is_group_admin: true)
+      ]
+
+      expect { client.create_group('foo') }.not_to raise_error
+      users.each { |u| expect { client.create_user(u, 'password') }.not_to raise_error }
+      expect(client.enumerate_users('foo')).to eq(users)
+    end
+  end
 end
