@@ -359,4 +359,26 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.enumerate_users('bar')).to eq([target_user])
     end
   end
+
+  describe '#set_user_password' do
+    it 'raises an error if the user does not exist' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.set_user_password('foo/bar', 'asdf1234') }.to raise_error(Symgate::Error)
+    end
+
+    it 'sets the password' do
+      client = account_key_client
+      user_client = user_password_client('foo/bar', 'asdf1235')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }.not_to raise_error
+
+      expect { user_client.authenticate }.to raise_error(Symgate::Error)
+
+      expect { client.set_user_password('foo/bar', 'asdf1235') }.not_to raise_error
+      expect { user_client.authenticate }.not_to raise_error
+    end
+  end
 end
