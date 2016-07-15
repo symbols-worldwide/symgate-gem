@@ -294,7 +294,6 @@ RSpec.describe(Symgate::Auth::Client) do
       user = Symgate::Auth::User.new(user_id: 'foo/bar')
       target_user = Symgate::Auth::User.new(user_id: 'foo/baz')
 
-
       expect { client.create_group('foo') }.not_to raise_error
       expect { client.create_user(user, 'asdf1234') }.not_to raise_error
 
