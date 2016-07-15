@@ -17,6 +17,14 @@ def user_password_client(user, password)
                             savon_opts: savon_opts)
 end
 
+def user_token_client(user, token)
+  Symgate::Auth::Client.new(account: 'integration',
+                            user: user,
+                            token: token,
+                            endpoint: 'http://localhost:11122/',
+                            savon_opts: savon_opts)
+end
+
 RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_groups' do
     it 'returns an empty array if there are no groups' do
@@ -379,6 +387,128 @@ RSpec.describe(Symgate::Auth::Client) do
 
       expect { client.set_user_password('foo/bar', 'asdf1235') }.not_to raise_error
       expect { user_client.authenticate }.not_to raise_error
+    end
+  end
+
+  describe '#destroy_user' do
+    it 'raises an error if the user does not exist' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.destroy_user('foo/bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'destroys the user' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+
+      expect(client.enumerate_users('foo')).to eq([user])
+
+      expect { client.destroy_user('foo/bar') }.not_to raise_error
+
+      expect(client.enumerate_users('foo')).to eq([])
+    end
+  end
+
+  describe '#authenticate' do
+    it 'raises an error if the user does not exist' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.authenticate }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the password is incorrect' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1235')
+      expect { client.authenticate }.to raise_error(Symgate::Error)
+    end
+
+    it 'authenticates and returns a token with normal auth' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.authenticate }.not_to raise_error
+      expect(client.authenticate).to be_a(String)
+      expect(client.authenticate).not_to eq('')
+    end
+
+    it 'authenticates and returns a token with impersonation using an account/key' do
+      client = account_key_client
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+
+      expect { client.authenticate('foo/bar') }.not_to raise_error
+      expect(client.authenticate('foo/bar')).to be_a(String)
+      expect(client.authenticate('foo/bar')).not_to eq('')
+    end
+
+    it 'raises an error when requesting impersonation as a normal user' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/baz'), 'asdf1234') }
+        .not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.authenticate('foo/baz') }.to raise_error(Symgate::Error)
+    end
+
+    # TODO: currently a bug in upstream, see SOS-206
+    # it 'raises an error when trying to authenticate with an account/key and no impersonation' do
+    #   client = account_key_client
+    #   expect { client.create_group('foo') }.not_to raise_error
+    #   expect { client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+    #     .not_to raise_error
+    #
+    #   expect { client.authenticate }.to raise_error(Symgate::Error)
+    # end
+
+    it 'raises an error when impersonating a user that does not exist' do
+      client = account_key_client
+      expect { client.create_group('foo') }.not_to raise_error
+
+      expect { client.authenticate('foo/bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'authenticates with a correct token' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      token = nil
+      expect { token = client.authenticate }.not_to raise_error
+
+      token_client = user_token_client('foo/bar', token)
+      expect { token_client.authenticate }.not_to raise_error
+    end
+
+    it 'raises an error when authenticating with an invalid token' do
+      admin_client = account_key_client
+      expect { admin_client.create_group('foo') }.not_to raise_error
+      expect { admin_client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234') }
+        .not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.authenticate }.not_to raise_error
+
+      token_client = user_token_client('foo/bar', 'gibberish')
+      expect { token_client.authenticate }.to raise_error(Symgate::Error)
     end
   end
 end
