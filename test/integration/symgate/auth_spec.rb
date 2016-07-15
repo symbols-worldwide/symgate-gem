@@ -301,4 +301,62 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.enumerate_users('foo')).to eq([target_user])
     end
   end
+
+  describe '#move_user' do
+    # TODO: Bug in upstream. See SOS-204
+    # it 'raises an error if the user does not exist' do
+    #   client = account_key_client
+    #
+    #   expect { client.create_group('foo') }.not_to raise_error
+    #   expect { client.create_group('bar') }.not_to raise_error
+    #   expect { client.move_user('foo/baz', 'bar/baz') }.to raise_error(Symgate::Error)
+    # end
+
+    it 'raises an error if the destination group does not exist' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/baz')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect { client.move_user('foo/baz', 'bar/baz') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the destination user already exists' do
+      client = account_key_client
+      users = [
+        Symgate::Auth::User.new(user_id: 'foo/baz'),
+        Symgate::Auth::User.new(user_id: 'bar/baz')
+      ]
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_group('bar') }.not_to raise_error
+      users.each { |u| expect { client.create_user(u, 'asdf1234') }.not_to raise_error }
+      expect { client.move_user('foo/baz', 'bar/baz') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the source and destination groups are the same' do
+      client = account_key_client
+      users = [
+        Symgate::Auth::User.new(user_id: 'foo/bar'),
+        Symgate::Auth::User.new(user_id: 'foo/baz')
+      ]
+
+      expect { client.create_group('foo') }.not_to raise_error
+      users.each { |u| expect { client.create_user(u, 'asdf1234') }.not_to raise_error }
+      expect { client.move_user('foo/bar', 'foo/baz') }.to raise_error(Symgate::Error)
+    end
+
+    it 'moves a user from one group to another' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/baz')
+      target_user = Symgate::Auth::User.new(user_id: 'bar/baz')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_group('bar') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect { client.move_user('foo/baz', 'bar/baz') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([])
+      expect(client.enumerate_users('bar')).to eq([target_user])
+    end
+  end
 end
