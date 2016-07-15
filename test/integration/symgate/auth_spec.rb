@@ -90,7 +90,7 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.enumerate_groups).to match_array(['bar'])
     end
 
-    # currently a bug in upstream, see SOS-200
+    # TODO: currently a bug in upstream, see SOS-200
     # it 'raises an error if the group does not exist' do
     #   client = account_key_client
     #
@@ -106,7 +106,7 @@ RSpec.describe(Symgate::Auth::Client) do
   end
 
   describe '#enumerate_users' do
-    # currently a bug in upstream, see SOS-201
+    # TODO: currently a bug in upstream, see SOS-201
     # it 'raises an error for an invalid group' do
     #   client = account_key_client
     #
@@ -200,7 +200,7 @@ RSpec.describe(Symgate::Auth::Client) do
       expect { user_client.create_user(new_user, 'asdf1234') }.to raise_error(Symgate::Error)
     end
 
-    # Bug in upstream. See SOS-202
+    # TODO: Bug in upstream. See SOS-202
     # it 'should raise an error when called with a blank password' do
     #   client = account_key_client
     #   user = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
@@ -208,5 +208,98 @@ RSpec.describe(Symgate::Auth::Client) do
     #   expect { client.create_group('foo') }.not_to raise_error
     #   expect { client.create_user(user, '') }.to raise_error(Symgate::Error)
     # end
+  end
+
+  describe '#update_user' do
+    it 'raises an error when called with a non-existent user' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.update_user(user) }.to raise_error(Symgate::Error)
+    end
+
+    it 'removes the is_group_admin setting when requested' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+
+      user.is_group_admin = false
+      expect { client.update_user(user) }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+    end
+
+    it 'adds the is_group_admin setting when requested' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: false)
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+
+      user.is_group_admin = true
+      expect { client.update_user(user) }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+    end
+
+    it 'does not raise an error or change anything when is_group_admin is left unchanged' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: false)
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+      expect { client.update_user(user) }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([user])
+    end
+  end
+
+  describe '#rename_user' do
+    # TODO: Bug in upstream. See SOS-203
+    # it 'raises an error if the user does not exist' do
+    #   client = account_key_client
+    #
+    #   expect { client.create_group('foo') }.not_to raise_error
+    #   expect { client.rename_user('foo/bar', 'foo/baz') }.to raise_error(Symgate::Error)
+    # end
+
+    it 'raises a user if the desired username is taken' do
+      client = account_key_client
+      users = [
+        Symgate::Auth::User.new(user_id: 'foo/bar'),
+        Symgate::Auth::User.new(user_id: 'foo/baz')
+      ]
+
+      expect { client.create_group('foo') }.not_to raise_error
+      users.each { |u| expect { client.create_user(u, 'asdf1234') }.not_to raise_error }
+
+      expect { client.rename_user('foo/bar', 'foo/baz') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the target group is different' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar')
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+
+      expect { client.rename_user('foo/bar', 'baz/qux') }.to raise_error(Symgate::Error)
+    end
+
+    it 'renames a user' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'foo/bar')
+      target_user = Symgate::Auth::User.new(user_id: 'foo/baz')
+
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+
+      expect { client.rename_user('foo/bar', 'foo/baz') }.not_to raise_error
+      expect(client.enumerate_users('foo')).to eq([target_user])
+    end
   end
 end
