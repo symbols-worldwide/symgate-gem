@@ -90,9 +90,11 @@ module Symgate
 
       # authenticates a user and returns a token, optionally with a user to impersonate
       def authenticate(user_to_impersonate = nil)
-        savon_request(:authenticate) do |soap|
+        r = savon_request(:authenticate) do |soap|
           soap.message(userid: user_to_impersonate) if user_to_impersonate
-        end.body[:authenticate_response][:authtoken]
+        end.body[:authenticate_response]
+
+        r ? r[:authtoken] : nil
       end
 
       # adds a language to the specified group and returns 'OK' if successful or
@@ -123,11 +125,9 @@ module Symgate
 
       # queries whether a language is available for a group
       def query_group_language(group_id, language)
-        resp = savon_request(:query_group_language) do |soap|
+        savon_request(:query_group_language) do |soap|
           soap.message(groupid: group_id, language: language)
-        end
-
-        resp.body[:query_group_language_response]
+        end.body[:query_group_language_response]
       end
 
       # lists the language for the currently authenticated user
@@ -142,9 +142,8 @@ module Symgate
 
       # queries whether a language is available for the currently authenticated user
       def query_language(language)
-        resp = savon_request(:query_language) { |soap| soap.message(language: language) }
-
-        resp.body[:query_language_response]
+        savon_request(:query_language) { |soap| soap.message(language: language) }
+          .body[:query_language_response]
       end
     end
   end
