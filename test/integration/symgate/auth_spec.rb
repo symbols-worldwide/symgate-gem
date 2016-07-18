@@ -147,7 +147,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
       expect { client.create_group('foo') }.not_to raise_error
       users.each { |u| expect { client.create_user(u, 'password') }.not_to raise_error }
-      expect(client.enumerate_users('foo')).to eq(users)
+      expect(client.enumerate_users('foo')).to match_array(users)
     end
   end
 
@@ -510,6 +510,133 @@ RSpec.describe(Symgate::Auth::Client) do
 
       token_client = user_token_client('foo/bar', 'gibberish')
       expect { token_client.authenticate }.to raise_error(Symgate::Error)
+    end
+  end
+
+  describe '#enumerate_group_languages' do
+    it 'raises an error when passed a non-existent group' do
+      client = account_key_client
+
+      expect { client.enumerate_group_languages('foo') }.to raise_error(Symgate::Error)
+    end
+
+    it 'returns an empty array when there are no group languages' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.enumerate_group_languages('foo') }.not_to raise_error
+      expect(client.enumerate_group_languages('foo')).to eq([])
+    end
+
+    it 'returns an array with one item when there is one group language' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.add_group_language('foo', 'English_UK') }.not_to raise_error
+      expect { client.enumerate_group_languages('foo') }.not_to raise_error
+      expect(client.enumerate_group_languages('foo')).to eq(['English_UK'])
+    end
+
+    it 'returns an array with multiple languages when there are multiple languages' do
+      client = account_key_client
+      languages = %w(English_UK Swedish Danish)
+
+      expect { client.create_group('foo') }.not_to raise_error
+      languages.each { |l| expect { client.add_group_language('foo', l) }.not_to raise_error }
+      expect { client.enumerate_group_languages('foo') }.not_to raise_error
+      expect(client.enumerate_group_languages('foo')).to match_array(languages)
+    end
+  end
+
+  describe '#add_group_language' do
+    it 'raises an error if the group does not exist' do
+      client = account_key_client
+
+      expect { client.add_group_language('foo', 'English_UK') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the language is invalid' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.add_group_language('foo', 'bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'adds a language to a group' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect(client.enumerate_group_languages('foo')).to eq([])
+      expect { client.add_group_language('foo', 'English_UK') }.not_to raise_error
+      expect { client.enumerate_group_languages('foo') }.not_to raise_error
+      expect(client.enumerate_group_languages('foo')).to eq(['English_UK'])
+    end
+  end
+
+  describe '#remove_group_language' do
+    it 'raises an error if the group does not exist' do
+      client = account_key_client
+
+      expect { client.remove_group_language('foo', 'English_UK') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the language is invalid' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.remove_group_language('foo', 'bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'returns NotExist if the group and language are valid, but the language is not assigned' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      r = nil
+      expect { r = client.remove_group_language('foo', 'English_UK') }.not_to raise_error
+      expect(r).to eq('NotExist')
+    end
+
+    it 'returns OK and removes the language if the group has the language assigned' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.add_group_language('foo', 'English_UK') }.not_to raise_error
+
+      r = nil
+      expect { r = client.remove_group_language('foo', 'English_UK') }.not_to raise_error
+      expect(r).to eq('OK')
+    end
+  end
+
+  describe '#query_group_language' do
+    it 'raises an error if the group does not exist' do
+      client = account_key_client
+
+      expect { client.query_group_language('foo', 'English_UK') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the language is invalid' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.query_group_language('foo', 'bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'returns false if the language is not assigned' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.query_group_language('foo', 'English_UK') }.not_to raise_error
+      expect(client.query_group_language('foo', 'English_UK')).to eq(false)
+    end
+
+    it 'returns true if the language is assigned' do
+      client = account_key_client
+
+      expect { client.create_group('foo') }.not_to raise_error
+      expect { client.add_group_language('foo', 'English_UK') }.not_to raise_error
+      expect { client.query_group_language('foo', 'English_UK') }.not_to raise_error
+      expect(client.query_group_language('foo', 'English_UK')).to eq(true)
     end
   end
 end
