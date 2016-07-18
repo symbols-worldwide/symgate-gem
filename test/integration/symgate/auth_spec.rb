@@ -639,4 +639,76 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.query_group_language('foo', 'English_UK')).to eq(true)
     end
   end
+
+  describe '#enumerate_languages' do
+    before(:each) do
+      client = account_key_client
+      client.create_group('foo')
+      client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234')
+    end
+
+    it 'raises an error if called with account/key credentials' do
+      client = account_key_client
+      expect { client.enumerate_languages }.to raise_error(Symgate::Error)
+    end
+
+    it 'returns an empty array when there are no languages assigned' do
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.enumerate_languages }.not_to raise_error
+      expect(client.enumerate_languages).to eq([])
+    end
+
+    it 'returns an array with one item when there is one language assigned' do
+      admin_client = account_key_client
+      expect { admin_client.add_group_language('foo', 'English_UK') }.not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.enumerate_languages }.not_to raise_error
+      expect(client.enumerate_languages).to eq(['English_UK'])
+    end
+
+    it 'returns an array with multiple items when there are multiple languages assigned' do
+      languages = %w(English_UK Danish Swedish)
+
+      admin_client = account_key_client
+      languages.each { |l| expect { admin_client.add_group_language('foo', l) }.not_to raise_error }
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.enumerate_languages }.not_to raise_error
+      expect(client.enumerate_languages).to match_array(languages)
+    end
+  end
+
+  describe '#query_language' do
+    before(:each) do
+      client = account_key_client
+      client.create_group('foo')
+      client.create_user(Symgate::Auth::User.new(user_id: 'foo/bar'), 'asdf1234')
+    end
+
+    it 'raises an error if called with account/key credentials' do
+      client = account_key_client
+      expect { client.query_language('English_UK') }.to raise_error(Symgate::Error)
+    end
+
+    it 'raises an error if the language is invalid' do
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.query_language('baz') }.to raise_error(Symgate::Error)
+    end
+
+    it 'returns false if the language is not assigned' do
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.query_language('English_UK') }.not_to raise_error
+      expect(client.query_language('English_UK')).to eq(false)
+    end
+
+    it 'returns true if the language is assigned' do
+      admin_client = account_key_client
+      expect { admin_client.add_group_language('foo', 'English_UK') }.not_to raise_error
+
+      client = user_password_client('foo/bar', 'asdf1234')
+      expect { client.query_language('English_UK') }.not_to raise_error
+      expect(client.query_language('English_UK')).to eq(true)
+    end
+  end
 end
