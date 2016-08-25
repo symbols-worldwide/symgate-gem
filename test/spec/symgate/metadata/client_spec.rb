@@ -35,7 +35,7 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.get_metadata).to match_array(
         [
           Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account'),
-          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
         ]
       )
     end
@@ -61,7 +61,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(scope: 'Teapot')).to raise_error(Symgate::Error)
+      expect { client.get_metadata(scope: 'Teapot') }.to raise_error(Symgate::Error)
     end
 
     it 'accepts an array of keys as an input' do
@@ -74,7 +74,7 @@ RSpec.describe(Symgate::Auth::Client) do
       expect(client.get_metadata(keys: %w(foo baz))).to match_array(
         [
           Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account'),
-          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
         ]
       )
     end
@@ -82,7 +82,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts a single key as an input' do
       savon.expects(:get_metadata)
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
-                            key: 'foo' })
+                            keys: %w(foo) })
            .returns(File.read('test/spec/fixtures/xml/get_metadata_one.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -95,27 +95,27 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'raises an error if "keys" is not an array' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(keys: 'foo')).to raise_error(Symgate::Error)
+      expect { client.get_metadata(keys: 'foo') }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if "keys" contains non-string items' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(keys: ['foo', 6])).to raise_error(Symgate::Error)
+      expect { client.get_metadata(keys: ['foo', 6]) }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if "key" is not a string' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(key: nil)).to raise_error(Symgate::Error)
+      expect { client.get_metadata(key: nil) }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if both "key" and "keys" are supplied' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(key: 'foo', keys: %w(bar baz))).to raise_error(Symgate::Error)
+      expect { client.get_metadata(key: 'foo', keys: %w(bar baz)) }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if an unknown option is supplied' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(kettle: 'black')).to raise_error(Symgate::Error)
+      expect { client.get_metadata(kettle: 'black') }.to raise_error(Symgate::Error)
     end
   end
 

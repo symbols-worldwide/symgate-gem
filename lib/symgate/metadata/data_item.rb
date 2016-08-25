@@ -10,6 +10,14 @@ module Symgate
         @scope = opts[:scope]
       end
 
+      def self.from_soap(hash)
+        Symgate::Metadata::DataItem.new(
+          key: hash[:@key],
+          scope: hash[:@scope],
+          value: hash[:value]
+        )
+      end
+
       def operator=(other)
         @key = other.key
         @value = other.value

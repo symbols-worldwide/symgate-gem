@@ -1,5 +1,6 @@
 require 'symgate/client'
-require 'symgate/auth/user'
+require 'symgate/error'
+require 'symgate/metadata/data_item'
 
 # rubocop:disable Style/AccessorMethodName
 
@@ -19,6 +20,15 @@ module Symgate
       # The 'key' option is also provided as a convenience, which works as above
       # for a single item.
       def get_metadata(opts = {})
+        o = opts
+        parse_get_metadata_opts o
+
+        resp = savon_request(:get_metadata) { |soap| soap.message(o) }
+
+        Symgate::Client.savon_array(
+          resp.body[:get_metadata_response],
+          :data_item
+        ).map { |item| Symgate::Metadata::DataItem.from_soap(item) }
       end
 
       # Creates one or more metadata items, overwriting any that match the key
@@ -31,6 +41,39 @@ module Symgate
       # their key(s). Specify a valid scope and a single string, or an array of
       # strings.
       def destroy_metadata(scope, keys)
+      end
+
+      private
+
+      def parse_get_metadata_opts(opts)
+        arrayize_key_option(opts)
+        check_keys_array_for_non_strings(opts)
+        check_for_unknown_options_to_get_metata(opts)
+      end
+
+      def arrayize_key_option(opts)
+        if opts.include? :key
+          raise Symgate::Error.new('Supply only one of "key" or "keys"') if opts.include? :keys
+          opts[:keys] = [opts[:key]]
+          opts.delete(:key)
+        end
+      end
+
+      def check_keys_array_for_non_strings(opts)
+        if opts.include? :keys
+          raise Symgate::Error.new('"keys" must be an array') unless opts[:keys].is_a? Array
+          opts[:keys].each do |k|
+            unless k.is_a? String
+              raise Symgate::Error.new("Expected key type of String but got #{k.class}")
+            end
+          end
+        end
+      end
+
+      def check_for_unknown_options_to_get_metata(opts)
+        opts.keys.each do |k|
+          raise Symgate::Error.new("Unknown option: #{k}") unless %i(keys scope).include? k
+        end
       end
     end
   end
