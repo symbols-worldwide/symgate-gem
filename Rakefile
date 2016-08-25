@@ -26,7 +26,7 @@ end
 
 desc 'Runs the rubocop linting tool'
 task :rubocop do
-  raise 'rubocop failed' unless system 'bundle exec rubocop'
+  raise 'rubocop failed' unless system 'bundle exec rubocop -D -E -S'
 end
 
 desc 'Run all tests'
@@ -37,7 +37,8 @@ namespace :teamcity do
   task :rubocop do
     raise 'rubocop failed' unless system 'bundle exec rubocop ' \
       '--no-color --require rubocop/formatter/junit_formatter ' \
-      '--format RuboCop::Formatter::JUnitFormatter --out .junit/rubocop.xml'
+      '--format RuboCop::Formatter::JUnitFormatter --out .junit/rubocop.xml' \
+      '-D -E -S'
   end
 
   desc 'Run all tests with junit output'
