@@ -121,15 +121,49 @@ RSpec.describe(Symgate::Auth::Client) do
 
   describe '#set_metadata' do
     it 'raises an error if no metadata items are supplied' do
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.set_metadata([]) }.to raise_error(Symgate::Error)
     end
 
     it 'accepts a single metadata item' do
+      savon.expects(:set_metadata)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            data_item: [{ '@key': 'foo', '@scope': 'Group', value: 'bar' }] })
+           .returns(File.read('test/spec/fixtures/xml/set_metadata.xml'))
+
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect do
+        client.set_metadata(
+          [
+            Symgate::Metadata::DataItem.new(key: 'foo', scope: 'Group', value: 'bar')
+          ]
+        )
+      end.not_to raise_error
     end
 
     it 'accepts multiple metadata items' do
+      savon.expects(:set_metadata)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            data_item: [
+                              { '@key': 'foo', '@scope': 'Group', value: 'bar' },
+                              { '@key': 'baz', '@scope': 'User', value: 'quz' }
+                            ] })
+           .returns(File.read('test/spec/fixtures/xml/set_metadata.xml'))
+
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect do
+        client.set_metadata(
+          [
+            Symgate::Metadata::DataItem.new(key: 'foo', scope: 'Group', value: 'bar'),
+            Symgate::Metadata::DataItem.new(key: 'baz', scope: 'User', value: 'qux')
+          ]
+        )
+      end.not_to raise_error
     end
 
     it 'raises an error if passed something that isn\'t a metadata item' do
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.set_metadata([{ foo: 'bar' }]) }.to raise_error(Symgate::Error)
     end
   end
 
