@@ -53,7 +53,7 @@ module Symgate
 
       def arrayize_key_option(opts)
         if opts.include? :key
-          raise Symgate::Error.new('Supply only one of "key" or "keys"') if opts.include? :keys
+          raise Symgate::Error, 'Supply only one of "key" or "keys"' if opts.include? :keys
           opts[:keys] = [opts[:key]]
           opts.delete(:key)
         end
@@ -61,10 +61,10 @@ module Symgate
 
       def check_keys_array_for_non_strings(opts)
         if opts.include? :keys
-          raise Symgate::Error.new('"keys" must be an array') unless opts[:keys].is_a? Array
+          raise Symgate::Error, '"keys" must be an array' unless opts[:keys].is_a? Array
           opts[:keys].each do |k|
             unless k.is_a? String
-              raise Symgate::Error.new("Expected key type of String but got #{k.class}")
+              raise Symgate::Error, "Expected key type of String but got #{k.class}"
             end
           end
         end
@@ -72,7 +72,7 @@ module Symgate
 
       def check_for_unknown_options_to_get_metata(opts)
         opts.keys.each do |k|
-          raise Symgate::Error.new("Unknown option: #{k}") unless %i(keys scope).include? k
+          raise Symgate::Error, "Unknown option: #{k}" unless %i(keys scope).include? k
         end
       end
     end
