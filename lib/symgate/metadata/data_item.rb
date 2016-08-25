@@ -19,7 +19,7 @@ module Symgate
       def ==(other)
         @key == other.key &&
           @value == other.value &&
-          @scope = other.scope
+          @scope == other.scope
       end
 
       def to_s
