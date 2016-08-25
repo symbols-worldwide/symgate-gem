@@ -30,6 +30,11 @@ module Symgate
       def ==(other)
         @user_id == other.user_id && @is_group_admin == other.is_group_admin
       end
+
+      def operator=(other)
+        @user_id = other.user_id
+        @is_group_admin = other.is_group_admin
+      end
     end
   end
 end
