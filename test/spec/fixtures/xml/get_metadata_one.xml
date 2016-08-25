@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns4="http://ws.widgit.com/schema/globaltypes/3.0"
+  xmlns:wl1x1="http://www.symgate.com/wordlist"
+  xmlns:cml2="http://ws.widgit.com/schema/cml/2.1"
+  xmlns:ns2="http://ws.widgit.com/schema/wordlist/3.0"
+  xmlns:ns3="http://ws.widgit.com/schema/auth/3.0"
+  xmlns:cml1="http://www.symgate.com/cml"
+  xmlns:ns1="http://ws.widgit.com/schema/symboliser/3.0"
+  xmlns:ns5="http://ws.widgit.com/schema/bridge/3.0"
+  xmlns:symboliser1x1="http://www.symgate.com/symgate">
+ <SOAP-ENV:Body>
+  <ns1:getMetadataResponse>
+   <ns3:dataItem key="foo" scope="Account">
+    <ns3:value>bar</ns3:value>
+   </ns3:dataItem>
+  </ns1:getMetadataResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
