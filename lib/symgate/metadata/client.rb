@@ -36,10 +36,11 @@ module Symgate
       # item or an array of items.
       def set_metadata(items)
         i = [items].flatten
-        i.each { |item| raise Symgate::Error, "'#{item.inspect}' is not a DataItem" unless item.is_a? Symgate::Metadata::DataItem }
+
+        check_array_for_type(i, Symgate::Metadata::DataItem)
         raise Symgate::Error, 'No items supplied' if i.empty?
 
-        savon_request(:set_metadata) { |soap| soap.message(data_item: i.map { |s| s.to_soap }) }
+        savon_request(:set_metadata) { |soap| soap.message(data_item: i.map(&:to_soap)) }
       end
 
       # Destroys one or more metadata items on the specified scope, specified by
@@ -47,7 +48,7 @@ module Symgate
       # strings.
       def destroy_metadata(scope, keys)
         k = [keys].flatten
-        k.each { |key| raise Symgate::Error, "'#{key.inspect}' is not a string" unless key.is_a? String }
+        check_array_for_type(k, String)
         raise Symgate::Error, 'No keys supplied' if k.empty?
 
         savon_request(:destroy_metadata) { |soap| soap.message(scope: scope, key: k) }
@@ -56,12 +57,12 @@ module Symgate
       private
 
       def parse_get_metadata_opts(opts)
-        arrayize_key_option(opts)
-        check_keys_array_for_non_strings(opts)
-        check_for_unknown_options_to_get_metata(opts)
+        arrayize_get_key_option(opts)
+        check_get_keys_array(opts)
+        check_for_unknown_get_opts(opts)
       end
 
-      def arrayize_key_option(opts)
+      def arrayize_get_key_option(opts)
         if opts.include? :key
           raise Symgate::Error, 'Supply only one of "key" or "keys"' if opts.include? :keys
           opts[:keys] = [opts[:key]]
@@ -69,20 +70,24 @@ module Symgate
         end
       end
 
-      def check_keys_array_for_non_strings(opts)
+      def check_get_keys_array(opts)
         if opts.include? :keys
           raise Symgate::Error, '"keys" must be an array' unless opts[:keys].is_a? Array
-          opts[:keys].each do |k|
-            unless k.is_a? String
-              raise Symgate::Error, "Expected key type of String but got #{k.class}"
-            end
-          end
+          check_array_for_type(opts[:keys], String)
         end
       end
 
-      def check_for_unknown_options_to_get_metata(opts)
+      def check_for_unknown_get_opts(opts)
         opts.keys.each do |k|
           raise Symgate::Error, "Unknown option: #{k}" unless %i(keys scope).include? k
+        end
+      end
+
+      def check_array_for_type(ary, type_name)
+        ary.each do |item|
+          unless item.is_a? type_name
+            raise Symgate::Error, "'#{item.inspect}' is not a #{type_name.name}"
+          end
         end
       end
     end
