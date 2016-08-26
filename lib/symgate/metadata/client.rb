@@ -22,6 +22,7 @@ module Symgate
       def get_metadata(opts = {})
         o = opts
         parse_get_metadata_opts o
+        o[:key] = o.delete(:keys) if o.include? :keys
 
         resp = savon_request(:get_metadata) { |soap| soap.message(o) }
 

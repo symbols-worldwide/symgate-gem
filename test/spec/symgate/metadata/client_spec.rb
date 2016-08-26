@@ -67,7 +67,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts an array of keys as an input' do
       savon.expects(:get_metadata)
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
-                            keys: %w(foo baz) })
+                            key: %w(foo baz) })
            .returns(File.read('test/spec/fixtures/xml/get_metadata_two.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -82,7 +82,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts a single key as an input' do
       savon.expects(:get_metadata)
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
-                            keys: %w(foo) })
+                            key: %w(foo) })
            .returns(File.read('test/spec/fixtures/xml/get_metadata_one.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
