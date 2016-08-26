@@ -176,43 +176,110 @@ RSpec.describe(Symgate::Metadata::Client) do
 
   describe '#destroy_metadata' do
     it 'raises an error with an invalid scope' do
-
+      expect { client.destroy_metadata('Teapot', 'foo') }.to raise_error(Symgate::Error)
     end
 
     it 'deletes user metadata for users when passed a key' do
+      expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
+      expect { create_data_item('baz', 'qux', 'User') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'User')
+        ]
+      )
 
+      expect { client.destroy_metadata('User', 'baz') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User')
+        ]
+      )
     end
 
     it 'deletes multiple metadata items for users when passed multiple keys' do
+      expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
+      expect { create_data_item('baz', 'qux', 'User') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'User')
+        ]
+      )
 
+      expect { client.destroy_metadata('User', %w(foo baz)) }.not_to raise_error
+      expect(client.get_metadata).to match_array([])
     end
 
     it 'does not raise an error when deleting an item that does not exist' do
-
+      expect { client.destroy_metadata('User', 'foo') }.not_to raise_error
     end
 
     it 'only deletes metadata for the specified scope' do
+      expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
+      expect { create_data_item('foo', 'baz', 'Group') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+        ]
+      )
 
+      expect { client.destroy_metadata('User', 'foo') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+        ]
+      )
     end
 
     it 'allows group admins to delete group-level metadata' do
+      expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+        ]
+      )
 
+      expect { client.destroy_metadata('Group', 'foo') }.not_to raise_error
+      expect(client.get_metadata).to match_array([])
     end
 
     it 'raises an error when non-group-admins attempt to delete group-level metadata' do
-
+      expect { non_admin_client.destroy_metadata('Group', 'foo') }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error when normal users attempt to delete account-level metadata' do
-
+      expect { client.destroy_metadata('Account', 'foo') }.to raise_error(Symgate::Error)
     end
 
     it 'allows account-level metadata to be deleted with an account/key' do
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).set_metadata(
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account')
+        )
+      end.not_to raise_error
 
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Account')
+        ]
+      )
+
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).destroy_metadata('Account', 'foo')
+      end.not_to raise_error
+
+      expect(client.get_metadata).to match_array([])
     end
 
     it 'raises an error when trying to delete user- or group-level metadata with an account/key' do
-
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).destroy_metadata('Group', 'foo')
+      end.to raise_error(Symgate::Error)
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).destroy_metadata('User', 'foo')
+      end.to raise_error(Symgate::Error)
     end
   end
 end
