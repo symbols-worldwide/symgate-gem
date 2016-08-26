@@ -40,7 +40,7 @@ module Symgate
         check_array_for_type(i, Symgate::Metadata::DataItem)
         raise Symgate::Error, 'No items supplied' if i.empty?
 
-        savon_request(:set_metadata) { |soap| soap.message(data_item: i.map(&:to_soap)) }
+        savon_request(:set_metadata) { |soap| soap.message('auth:data_item': i.map(&:to_soap)) }
       end
 
       # Destroys one or more metadata items on the specified scope, specified by

@@ -22,7 +22,7 @@ module Symgate
         {
           '@key': key,
           '@scope': scope,
-          value: value
+          'auth:value': value
         }
       end
 

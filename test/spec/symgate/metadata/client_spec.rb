@@ -128,7 +128,9 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts a single metadata item' do
       savon.expects(:set_metadata)
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
-                            data_item: [{ '@key': 'foo', '@scope': 'Group', value: 'bar' }] })
+                            'auth:data_item': [{ '@key': 'foo',
+                                                 '@scope': 'Group',
+                                                 'auth:value': 'bar' }] })
            .returns(File.read('test/spec/fixtures/xml/set_metadata.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -142,9 +144,9 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts multiple metadata items' do
       savon.expects(:set_metadata)
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
-                            data_item: [
-                              { '@key': 'foo', '@scope': 'Group', value: 'bar' },
-                              { '@key': 'baz', '@scope': 'User', value: 'qux' }
+                            'auth:data_item': [
+                              { '@key': 'foo', '@scope': 'Group', 'auth:value': 'bar' },
+                              { '@key': 'baz', '@scope': 'User', 'auth:value': 'qux' }
                             ] })
            .returns(File.read('test/spec/fixtures/xml/set_metadata.xml'))
 
