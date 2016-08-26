@@ -21,3 +21,26 @@ RSpec.configure do |config|
                                    'VALUES ("integration","x");')
   end
 end
+
+def account_key_client_of_type(client_type)
+  client_type.new(account: 'integration',
+                  key: 'x',
+                  endpoint: 'http://localhost:11122/',
+                  savon_opts: savon_opts)
+end
+
+def user_password_client_of_type(client_type, user, password)
+  client_type.new(account: 'integration',
+                  user: user,
+                  password: password,
+                  endpoint: 'http://localhost:11122/',
+                  savon_opts: savon_opts)
+end
+
+def user_token_client_of_type(client_type, user, token)
+  client_type.new(account: 'integration',
+                  user: user,
+                  token: token,
+                  endpoint: 'http://localhost:11122/',
+                  savon_opts: savon_opts)
+end

@@ -2,30 +2,19 @@ require_relative '../spec_helper.rb'
 
 require 'symgate/auth/client'
 
-def account_key_client
-  Symgate::Auth::Client.new(account: 'integration',
-                            key: 'x',
-                            endpoint: 'http://localhost:11122/',
-                            savon_opts: savon_opts)
-end
-
-def user_password_client(user, password)
-  Symgate::Auth::Client.new(account: 'integration',
-                            user: user,
-                            password: password,
-                            endpoint: 'http://localhost:11122/',
-                            savon_opts: savon_opts)
-end
-
-def user_token_client(user, token)
-  Symgate::Auth::Client.new(account: 'integration',
-                            user: user,
-                            token: token,
-                            endpoint: 'http://localhost:11122/',
-                            savon_opts: savon_opts)
-end
-
 RSpec.describe(Symgate::Auth::Client) do
+  def account_key_client
+    account_key_client_of_type Symgate::Auth::Client
+  end
+
+  def user_password_client(user, password)
+    user_password_client_of_type(Symgate::Auth::Client, user, password)
+  end
+
+  def user_token_client(user, token)
+    user_token_client_of_type(Symgate::Auth::Client, user, token)
+  end
+
   describe '#enumerate_groups' do
     it 'returns an empty array if there are no groups' do
       client = account_key_client
