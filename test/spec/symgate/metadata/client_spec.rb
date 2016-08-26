@@ -169,18 +169,46 @@ RSpec.describe(Symgate::Auth::Client) do
 
   describe '#destroy_metadata' do
     it 'raises an error if an invalid scope is supplied' do
+      savon.expects(:destroy_metadata)
+        .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                         scope: 'Teapot',
+                         key: ['foo'] })
+        .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
+
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_metadata('Teapot', 'foo') }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if no keys are supplied' do
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_metadata('User', []) }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if supplied a key that isn\'t a string' do
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_metadata('User', 7) }.to raise_error(Symgate::Error)
     end
 
     it 'accepts a valid scope and single key string' do
+      savon.expects(:destroy_metadata)
+        .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                         scope: 'User',
+                         key: ['foo'] })
+        .returns(File.read('test/spec/fixtures/xml/destroy_metadata.xml'))
+
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_metadata('User', 'foo') }.not_to raise_error
     end
 
     it 'accepts a valid scope and multiple key strings' do
+      savon.expects(:destroy_metadata)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            scope: 'User',
+                            key: %w(foo bar) })
+           .returns(File.read('test/spec/fixtures/xml/destroy_metadata.xml'))
+
+      client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_metadata('User', %w(foo bar)) }.not_to raise_error
     end
   end
 end
