@@ -91,35 +91,86 @@ RSpec.describe(Symgate::Metadata::Client) do
 
   describe '#set_metadata' do
     it 'allows a user to set a user-level permission' do
-
+      expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User')
+        ]
+      )
     end
 
     it 'allows a group admin user to set a group-level permission' do
-
+      expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+        ]
+      )
     end
 
     it 'does not allow a non-admin user to set a group-level permission' do
-
+      expect do
+        non_admin_client.set_metadata(
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Group')
+        )
+      end.to raise_error(Symgate::Error)
     end
 
     it 'disallows setting of account-level permissions for users' do
-
+      expect { create_data_item('foo', 'bar', 'Account') }.to raise_error(Symgate::Error)
     end
 
     it 'allows setting of account-level permissions with an account/key' do
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).set_metadata(
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account')
+        )
+      end.not_to raise_error
 
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Account')
+        ]
+      )
     end
 
     it 'raises an error when setting of user- and group-level permissions with an account/key' do
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).set_metadata(
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Group')
+        )
+      end.to raise_error(Symgate::Error)
 
+      expect do
+        account_key_client_of_type(Symgate::Metadata::Client).set_metadata(
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User')
+        )
+      end.to raise_error(Symgate::Error)
     end
 
     it 'overwrites data with the same key and scope when passed one which already exists' do
-
+      expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
+      expect { create_data_item('foo', 'baz', 'Group') }.not_to raise_error
+      expect(client.get_metadata).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+        ]
+      )
     end
 
     it 'creates separate data items for different scopes with the same key' do
-
+      expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
+      expect { create_data_item('foo', 'baz', 'User') }.not_to raise_error
+      expect(client.get_metadata(scope: 'Group')).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+        ]
+      )
+      expect(client.get_metadata(scope: 'User')).to match_array(
+        [
+          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'User')
+        ]
+      )
     end
   end
 
