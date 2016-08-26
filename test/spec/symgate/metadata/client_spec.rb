@@ -134,9 +134,7 @@ RSpec.describe(Symgate::Auth::Client) do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
       expect do
         client.set_metadata(
-          [
-            Symgate::Metadata::DataItem.new(key: 'foo', scope: 'Group', value: 'bar')
-          ]
+          Symgate::Metadata::DataItem.new(key: 'foo', scope: 'Group', value: 'bar')
         )
       end.not_to raise_error
     end
@@ -146,7 +144,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
                             data_item: [
                               { '@key': 'foo', '@scope': 'Group', value: 'bar' },
-                              { '@key': 'baz', '@scope': 'User', value: 'quz' }
+                              { '@key': 'baz', '@scope': 'User', value: 'qux' }
                             ] })
            .returns(File.read('test/spec/fixtures/xml/set_metadata.xml'))
 

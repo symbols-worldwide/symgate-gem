@@ -35,12 +35,22 @@ module Symgate
       # and scope specified within the DataItem object. Supply either a single
       # item or an array of items.
       def set_metadata(items)
+        i = [items].flatten
+        i.each { |item| raise Symgate::Error, "'#{item.inspect}' is not a DataItem" unless item.is_a? Symgate::Metadata::DataItem }
+        raise Symgate::Error, 'No items supplied' if i.empty?
+
+        savon_request(:set_metadata) { |soap| soap.message(data_item: i.map { |s| s.to_soap }) }
       end
 
       # Destroys one or more metadata items on the specified scope, specified by
       # their key(s). Specify a valid scope and a single string, or an array of
       # strings.
       def destroy_metadata(scope, keys)
+        k = [keys].flatten
+        k.each { |key| raise Symgate::Error, "'#{key.inspect}' is not a string" unless key.is_a? String }
+        raise Symgate::Error, 'No keys supplied' if k.empty?
+
+        savon_request(:destroy_metadata) { |soap| soap.message(scope: scope, key: k) }
       end
 
       private

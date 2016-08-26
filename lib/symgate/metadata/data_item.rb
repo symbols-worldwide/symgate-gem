@@ -18,6 +18,14 @@ module Symgate
         )
       end
 
+      def to_soap
+        {
+          '@key': key,
+          '@scope': scope,
+          value: value
+        }
+      end
+
       def operator=(other)
         @key = other.key
         @value = other.value
