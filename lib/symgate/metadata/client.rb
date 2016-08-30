@@ -54,43 +54,6 @@ module Symgate
 
         savon_request(:destroy_metadata) { |soap| soap.message(scope: scope, key: k) }
       end
-
-      private
-
-      def parse_get_metadata_opts(opts)
-        arrayize_get_key_option(opts)
-        check_get_keys_array(opts)
-        check_for_unknown_get_opts(opts)
-      end
-
-      def arrayize_get_key_option(opts)
-        if opts.include? :key
-          raise Symgate::Error, 'Supply only one of "key" or "keys"' if opts.include? :keys
-          opts[:keys] = [opts[:key]]
-          opts.delete(:key)
-        end
-      end
-
-      def check_get_keys_array(opts)
-        if opts.include? :keys
-          raise Symgate::Error, '"keys" must be an array' unless opts[:keys].is_a? Array
-          check_array_for_type(opts[:keys], String)
-        end
-      end
-
-      def check_for_unknown_get_opts(opts)
-        opts.keys.each do |k|
-          raise Symgate::Error, "Unknown option: #{k}" unless %i(keys scope).include? k
-        end
-      end
-
-      def check_array_for_type(ary, type_name)
-        ary.each do |item|
-          unless item.is_a? type_name
-            raise Symgate::Error, "'#{item.inspect}' is not a #{type_name.name}"
-          end
-        end
-      end
     end
   end
 end

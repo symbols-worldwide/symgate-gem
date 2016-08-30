@@ -98,5 +98,43 @@ module Symgate
       e = response.body[response_type]
       raise Symgate::Error, e unless e.to_s == ''
     end
+
+    def parse_get_metadata_opts(opts)
+      arrayize_option(:key, :keys, opts)
+      check_option_is_array_of(String, :keys, opts)
+      check_for_unknown_opts(%i(keys scope), opts)
+    end
+
+    def arrayize_option(singular, plural, opts)
+      if opts.include? singular # else nothing to do
+        if opts.include? plural
+          raise Symgate::Error, "Options can't include both #{singular} and #{plural}"
+        end
+
+        opts[plural] = [opts[singular]]
+        opts.delete(singular)
+      end
+    end
+
+    def check_option_is_array_of(classname, key, opts)
+      if opts.include? key
+        raise Symgate::Error, "#{key} must be an array" unless opts[key].is_a? Array
+        check_array_for_type(opts[key], classname)
+      end
+    end
+
+    def check_for_unknown_opts(keys, opts)
+      opts.keys.each do |k|
+        raise Symgate::Error, "Unknown option: #{k}" unless keys.include? k
+      end
+    end
+
+    def check_array_for_type(ary, type_name)
+      ary.each do |item|
+        unless item.is_a? type_name
+          raise Symgate::Error, "'#{item.inspect}' is not a #{type_name.name}"
+        end
+      end
+    end
   end
 end
