@@ -22,13 +22,15 @@ module Symgate
 
     # returns an array from 0 or more items when an array is expected.
     # (savon returns a single value for things that can be a sequence of multiple objects)
-    # expects a hash, and a key for the array within that hash
-    def self.savon_array(hash, key)
+    # expects a hash, and a key for the array within that hash.
+    # if classname is specified, the method will return an array of objects initialised
+    # by the hash contents
+    def self.savon_array(hash, key, classname = nil)
       if hash && hash.include?(key)
         [hash[key]].flatten
       else
         []
-      end
+      end.map { |v| classname ? classname.new(v) : v }
     end
 
     protected

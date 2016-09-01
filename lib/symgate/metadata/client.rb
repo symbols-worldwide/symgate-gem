@@ -28,8 +28,9 @@ module Symgate
 
         Symgate::Client.savon_array(
           resp.body[:get_metadata_response],
-          :data_item
-        ).map { |item| Symgate::Metadata::DataItem.from_soap(item) }
+          :data_item,
+          Symgate::Metadata::DataItem
+        )
       end
 
       # Creates one or more metadata items, overwriting any that match the key

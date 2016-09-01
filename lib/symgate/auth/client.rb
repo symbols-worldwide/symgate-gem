@@ -40,8 +40,9 @@ module Symgate
 
         Symgate::Client.savon_array(
           resp.body[:enumerate_users_response],
-          :user
-        ).map { |u| Symgate::Auth::User.from_soap(u) }
+          :user,
+          Symgate::Auth::User
+        )
       end
 
       # creates a new user from a Symgate::Auth::User, with the specified password
