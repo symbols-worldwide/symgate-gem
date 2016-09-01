@@ -1,12 +1,12 @@
+require 'symgate/type'
+
 module Symgate
   module Auth
     # defines a symgate user
-    class User
-      attr_accessor :user_id, :is_group_admin
-
-      def initialize(params = {})
-        @user_id = params[:user_id]
-        @is_group_admin = params[:is_group_admin] || false
+    class User < Symgate::Type
+      def initialize(opts = {})
+        super(opts)
+        @is_group_admin = opts[:is_group_admin] || false
       end
 
       def self.from_soap(hash)
@@ -27,13 +27,10 @@ module Symgate
         @user_id + (@is_group_admin ? '(admin)' : '')
       end
 
-      def ==(other)
-        @user_id == other.user_id && @is_group_admin == other.is_group_admin
-      end
+      protected
 
-      def operator=(other)
-        @user_id = other.user_id
-        @is_group_admin = other.is_group_admin
+      def attributes
+        %i(user_id is_group_admin)
       end
     end
   end
