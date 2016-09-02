@@ -21,11 +21,11 @@ module Symgate
       end
     end
 
-    protected
-
     def self.hash_value_with_optional_namespace(namespace, key, hash)
       hash[key] || hash["#{namespace}:#{key}".to_sym]
     end
+
+    protected
 
     # override this to return an array of symbols for your class variables
     # :nocov:
