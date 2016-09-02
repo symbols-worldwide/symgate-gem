@@ -1,6 +1,7 @@
 require 'rspec'
 require 'savon/mock/spec_helper'
 require 'simplecov'
+require 'simplecov-teamcity-summary'
 
 SimpleCov.start do
   minimum_coverage 100
