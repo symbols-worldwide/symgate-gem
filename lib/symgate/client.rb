@@ -30,7 +30,7 @@ module Symgate
         [hash[key]].flatten
       else
         []
-      end.map { |v| classname ? classname.new(v) : v }
+      end.map { |v| classname ? classname.from_soap(v) : v }
     end
 
     protected
