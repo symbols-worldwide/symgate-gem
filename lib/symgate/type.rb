@@ -21,12 +21,6 @@ module Symgate
       end
     end
 
-    def operator=(other)
-      attributes.each do |a|
-        instance_variable_set "@#{a}", other.instance_variable_get("@#{a}")
-      end
-    end
-
     protected
 
     # override this to return an array of symbols for your class variables

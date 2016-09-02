@@ -19,21 +19,6 @@ RSpec.describe(Symgate::Auth::User) do
     expect(u.is_group_admin).to eq(true)
   end
 
-  it 'copies data when using the assignment operator' do
-    u = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
-
-    expect(u.user_id).to eq('foo/bar')
-    expect(u.is_group_admin).to eq(true)
-
-    u2 = Symgate::Auth::User.new(user_id: 'bar/baz', is_group_admin: false)
-    expect(u2.user_id).to eq('bar/baz')
-    expect(u2.is_group_admin).to eq(false)
-
-    u2 = u
-    expect(u2.user_id).to eq('foo/bar')
-    expect(u2.is_group_admin).to eq(true)
-  end
-
   it 'allows comparison with another User' do
     u = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
     u2 = Symgate::Auth::User.new(user_id: 'bar/baz', is_group_admin: false)
