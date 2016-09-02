@@ -15,3 +15,4 @@
 /.vagrant/
 /Berksfile.lock
 /vendor/
+/coverage/

@@ -1,5 +1,17 @@
 require 'rspec'
 require 'savon/mock/spec_helper'
+require 'simplecov'
+
+SimpleCov.start do
+  minimum_coverage 100
+
+  if ENV['TEAMCITY_VERSION']
+    at_exit do
+      SimpleCov::Formatter::TeamcitySummaryFormatter.new.format(SimpleCov.result)
+      SimpleCov.result.format!
+    end
+  end
+end
 
 RSpec.configure do |config|
   include Savon::SpecHelper
