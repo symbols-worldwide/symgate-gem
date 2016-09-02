@@ -48,4 +48,15 @@ RSpec.describe(Symgate::Metadata::DataItem) do
   it 'raises an error when created with an unknown parameter' do
     expect { Symgate::Metadata::DataItem.new(teapot: false) }.to raise_error(Symgate::Error)
   end
+
+  it 'generates a string summary of the object' do
+    d = Symgate::Metadata::DataItem.new(key: 'monkey',
+                                        value: 'banana',
+                                        scope: 'teapot')
+
+    expect(d.to_s).to be_a(String)
+    expect(d.to_s).to include('monkey')
+    expect(d.to_s).to include('banana')
+    expect(d.to_s).to include('teapot')
+  end
 end

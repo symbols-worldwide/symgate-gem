@@ -33,4 +33,14 @@ RSpec.describe(Symgate::Auth::User) do
   it 'raises an error when created with an unknown parameter' do
     expect { Symgate::Auth::User.new(teapot: false) }.to raise_error(Symgate::Error)
   end
+
+  it 'generates a string summary of the object' do
+    u = Symgate::Auth::User.new(user_id: 'foo/bar')
+    expect(u.to_s).to be_a(String)
+    expect(u.to_s).to include('foo/bar')
+    expect(u.to_s).not_to include('admin')
+
+    u.is_group_admin = true
+    expect(u.to_s).to include('admin')
+  end
 end
