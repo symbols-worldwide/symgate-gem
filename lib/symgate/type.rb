@@ -24,8 +24,10 @@ module Symgate
     protected
 
     # override this to return an array of symbols for your class variables
+    # :nocov:
     def attributes
       raise Symgate::Error, "No attributes defined for object type #{self.class.name}"
     end
+    # :nocov:
   end
 end
