@@ -23,6 +23,10 @@ module Symgate
 
     protected
 
+    def self.hash_value_with_optional_namespace(namespace, key, hash)
+      hash[key] || hash["#{namespace}:#{key}".to_sym]
+    end
+
     # override this to return an array of symbols for your class variables
     # :nocov:
     def attributes

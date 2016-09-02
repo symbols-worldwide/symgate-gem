@@ -8,7 +8,7 @@ module Symgate
         Symgate::Metadata::DataItem.new(
           key: hash[:@key],
           scope: hash[:@scope],
-          value: hash[:value]
+          value: hash_value_with_optional_namespace(:auth, :value, hash)
         )
       end
 

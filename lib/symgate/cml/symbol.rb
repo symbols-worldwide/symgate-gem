@@ -6,16 +6,16 @@ module Symgate
     class Symbol < Symgate::Type
       def self.from_soap(hash)
         Symgate::Cml::Symbol.new(
-          symset: hash[:symset] || hash[:'cml:symset'],
-          main: hash[:main] || hash[:'cml:main'],
-          top_left: hash[:top_left] || hash[:'cml:top_left'],
-          top_right: hash[:top_right] || hash[:'cml:top_right'],
-          bottom_left: hash[:bottom_left] || hash[:'cml:bottom_left'],
-          bottom_right: hash[:bottom_right] || hash[:'cml:bottom_right'],
-          full_left: hash[:full_left] || hash[:'cml:full_left'],
-          full_right: hash[:full_right] || hash[:'cml:full_right'],
-          top: hash[:top] || hash[:'cml:top'],
-          extra: hash[:extra] || hash[:'cml:extra']
+          symset: hash_value_with_optional_namespace(:cml, :symset, hash),
+          main: hash_value_with_optional_namespace(:cml, :main, hash),
+          top_left: hash_value_with_optional_namespace(:cml, :top_left, hash),
+          top_right: hash_value_with_optional_namespace(:cml, :top_right, hash),
+          bottom_left: hash_value_with_optional_namespace(:cml, :bottom_left, hash),
+          bottom_right: hash_value_with_optional_namespace(:cml, :bottom_right, hash),
+          full_left: hash_value_with_optional_namespace(:cml, :full_left, hash),
+          full_right: hash_value_with_optional_namespace(:cml, :full_right, hash),
+          top: hash_value_with_optional_namespace(:cml, :top, hash),
+          extra: hash_value_with_optional_namespace(:cml, :extra, hash)
         )
       end
 
