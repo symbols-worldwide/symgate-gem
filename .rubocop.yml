@@ -14,3 +14,6 @@ Metrics/MethodLength:
 
 Style/NumericLiterals:
   Enabled: false
+
+Metrics/ClassLength:
+  Max: 120
