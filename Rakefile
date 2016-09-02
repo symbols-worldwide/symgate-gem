@@ -41,8 +41,31 @@ namespace :teamcity do
       '-D -E -S'
   end
 
+  desc 'Archives coverage html report into a zip'
+  task :zip_coverage do
+    Dir.chdir('coverage') do
+      system 'zip ../coverage.zip -r *'
+    end
+  end
+
   desc 'Run all tests with junit output'
-  task test: [:rubocop, :spec, :'spec:integration']
+  task :test do
+    first_exception = nil
+
+    %W[teamcity:rubocop
+       teamcity:spec
+       teamcity:zip_coverage
+       teamcity:spec:integration
+       ].each do |task_name|
+      begin
+        Rake::Task[task_name].invoke
+      rescue Exception => e
+        first_exception = e if first_exception.nil?
+      end
+    end
+
+    raise first_exception if first_exception
+  end
 end
 
 namespace :test do
