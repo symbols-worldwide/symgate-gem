@@ -1,4 +1,7 @@
 require 'bundler/gem_tasks'
+
+# rubocop:disable Lint/RescueException
+
 begin
   require 'rspec/core/rake_task'
   RSpec::Core::RakeTask.new(:spec) do |spec|
@@ -52,11 +55,10 @@ namespace :teamcity do
   task :test do
     first_exception = nil
 
-    %W[teamcity:rubocop
+    %w(teamcity:rubocop
        teamcity:spec
        teamcity:zip_coverage
-       teamcity:spec:integration
-       ].each do |task_name|
+       teamcity:spec:integration).each do |task_name|
       begin
         Rake::Task[task_name].invoke
       rescue Exception => e
