@@ -63,4 +63,8 @@ RSpec.describe(Symgate::Metadata::DataItem) do
     d2.scope = 'scope'
     expect(d == d2).to be_truthy
   end
+
+  it 'raises an error when created with an unknown parameter' do
+    expect { Symgate::Metadata::DataItem.new(teapot: false) }.to raise_error(Symgate::Error)
+  end
 end

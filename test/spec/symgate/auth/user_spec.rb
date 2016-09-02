@@ -44,4 +44,8 @@ RSpec.describe(Symgate::Auth::User) do
     u2.user_id = 'foo/bar'
     expect(u == u2).to be_truthy
   end
+
+  it 'raises an error when created with an unknown parameter' do
+    expect { Symgate::Auth::User.new(teapot: false) }.to raise_error(Symgate::Error)
+  end
 end
