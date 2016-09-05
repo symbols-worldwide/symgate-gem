@@ -11,7 +11,7 @@ module Symgate
           uuid: hash_value_with_optional_namespace(:wl, :uuid, hash),
           engine: hash_value_with_optional_namespace(:wl, :engine, hash),
           entry_count: hash_value_with_optional_namespace(:wl, :entrycount, hash),
-          last_change: hash_value_with_optional_namespace(:wl, :lastchange, hash),
+          last_change: hash_value_with_optional_namespace(:wl, :lastchange, hash)
         )
       end
 

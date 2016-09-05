@@ -111,7 +111,8 @@ RSpec.describe(Symgate::Wordlist::Entry) do
   end
 
   it 'raises an error when created with an unknown parameter' do
-    expect { Symgate::Wordlist::GraphicAttachment.new(teapot: false) }.to raise_error(Symgate::Error)
+    expect { Symgate::Wordlist::GraphicAttachment.new(teapot: false) }
+      .to raise_error(Symgate::Error)
   end
 
   it 'generates a string summary of the object' do
