@@ -10,6 +10,7 @@ module Symgate
           context: hash_value_with_optional_namespace(:wl, :context, hash),
           uuid: hash_value_with_optional_namespace(:wl, :uuid, hash),
           engine: hash_value_with_optional_namespace(:wl, :engine, hash),
+          scope: hash_value_with_optional_namespace(:wl, :scope, hash),
           entry_count: hash_value_with_optional_namespace(:wl, :entrycount, hash),
           last_change: hash_value_with_optional_namespace(:wl, :lastchange, hash)
         )
@@ -21,6 +22,7 @@ module Symgate
           context: @context,
           uuid: @uuid,
           engine: @engine,
+          scope: @scope,
           entrycount: @entrycount,
           lastchange: @lastchange
         }
@@ -33,7 +35,7 @@ module Symgate
       protected
 
       def attributes
-        %i(name context uuid entry_count last_change engine)
+        %i(name context uuid entry_count last_change engine scope)
       end
     end
   end

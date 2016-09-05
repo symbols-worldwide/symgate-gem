@@ -11,6 +11,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
     i.context = 'User'
     i.uuid = '4c1ef7d0-5357-0134-9ec1-20cf302b46f2'
     i.engine = 'sql'
+    i.scope = 'Group'
     i.entry_count = 512
     i.last_change = dt
 
@@ -18,6 +19,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
     expect(i.context).to eq('User')
     expect(i.uuid).to eq('4c1ef7d0-5357-0134-9ec1-20cf302b46f2')
     expect(i.engine).to eq('sql')
+    expect(i.scope).to eq('Group')
     expect(i.entry_count).to eq(512)
     expect(i.last_change).to eq(dt)
   end
@@ -28,6 +30,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
                                     context: 'User',
                                     uuid: '4c1ef7d0-5357-0134-9ec1-20cf302b46f2',
                                     engine: 'sql',
+                                    scope: 'Group',
                                     entry_count: 512,
                                     last_change: dt)
 
@@ -35,6 +38,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
     expect(i.context).to eq('User')
     expect(i.uuid).to eq('4c1ef7d0-5357-0134-9ec1-20cf302b46f2')
     expect(i.engine).to eq('sql')
+    expect(i.scope).to eq('Group')
     expect(i.entry_count).to eq(512)
     expect(i.last_change).to eq(dt)
   end
@@ -45,6 +49,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
                                     context: 'User',
                                     uuid: '4c1ef7d0-5357-0134-9ec1-20cf302b46f2',
                                     engine: 'sql',
+                                    scope: 'Group',
                                     entry_count: 512,
                                     last_change: dt)
 
@@ -56,6 +61,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
                                          'f7a23690-534a-0134-9ec1-20cf302b46f2',
                                          '4c1ef7d0-5357-0134-9ec1-20cf302b46f2')
     check_comparison_operator_for_member(i, i2, :engine, 'disk', 'sql')
+    check_comparison_operator_for_member(i, i2, :scope, 'User', 'Group')
     check_comparison_operator_for_member(i, i2, :entry_count, 256, 512)
     check_comparison_operator_for_member(i, i2, :last_change, dt - 30, dt)
   end
@@ -69,6 +75,7 @@ RSpec.describe(Symgate::Wordlist::Info) do
                                     context: 'User',
                                     uuid: '4c1ef7d0-5357-0134-9ec1-20cf302b46f2',
                                     engine: 'sql',
+                                    scope: 'Group',
                                     entry_count: 512,
                                     last_change: DateTime.now)
 
