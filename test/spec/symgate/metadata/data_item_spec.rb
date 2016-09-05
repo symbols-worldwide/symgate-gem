@@ -29,20 +29,11 @@ RSpec.describe(Symgate::Metadata::DataItem) do
                                         value: 'value',
                                         scope: 'scope')
 
-    d2 = Symgate::Metadata::DataItem.new(key: 'monkey',
-                                         value: 'banana',
-                                         scope: 'teapot')
+    d2 = d.dup
 
-    expect(d == d2).to be_falsey
-
-    d2.key = 'key'
-    expect(d == d2).to be_falsey
-
-    d2.value = 'value'
-    expect(d == d2).to be_falsey
-
-    d2.scope = 'scope'
-    expect(d == d2).to be_truthy
+    check_comparison_operator_for_member(d, d2, :key, 'foo', 'key')
+    check_comparison_operator_for_member(d, d2, :value, 'foo', 'value')
+    check_comparison_operator_for_member(d, d2, :scope, 'foo', 'scope')
   end
 
   it 'raises an error when created with an unknown parameter' do

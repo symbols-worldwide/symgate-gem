@@ -65,48 +65,18 @@ RSpec.describe(Symgate::Cml::Symbol) do
                                  top: 'top',
                                  extra: 'extra')
 
-    s2 = Symgate::Cml::Symbol.new(symset: 'a',
-                                  main: 'b',
-                                  top_left: 'c',
-                                  top_right: 'd',
-                                  bottom_left: 'e',
-                                  bottom_right: 'f',
-                                  full_left: 'g',
-                                  full_right: 'h',
-                                  top: 'i',
-                                  extra: 'j')
+    s2 = s.dup
 
-    expect(s == s2).to be_falsey
-
-    s2.symset = 'symset'
-    expect(s == s2).to be_falsey
-
-    s2.main = 'main'
-    expect(s == s2).to be_falsey
-
-    s2.top_left = 'top_left'
-    expect(s == s2).to be_falsey
-
-    s2.top_right = 'top_right'
-    expect(s == s2).to be_falsey
-
-    s2.bottom_left = 'bottom_left'
-    expect(s == s2).to be_falsey
-
-    s2.bottom_right = 'bottom_right'
-    expect(s == s2).to be_falsey
-
-    s2.full_left = 'full_left'
-    expect(s == s2).to be_falsey
-
-    s2.full_right = 'full_right'
-    expect(s == s2).to be_falsey
-
-    s2.top = 'top'
-    expect(s == s2).to be_falsey
-
-    s2.extra = 'extra'
-    expect(s == s2).to be_truthy
+    check_comparison_operator_for_member(s, s2, :symset, 'foo', 'symset')
+    check_comparison_operator_for_member(s, s2, :main, 'foo', 'main')
+    check_comparison_operator_for_member(s, s2, :top_left, 'foo', 'top_left')
+    check_comparison_operator_for_member(s, s2, :top_right, 'foo', 'top_right')
+    check_comparison_operator_for_member(s, s2, :bottom_left, 'foo', 'bottom_left')
+    check_comparison_operator_for_member(s, s2, :bottom_right, 'foo', 'bottom_right')
+    check_comparison_operator_for_member(s, s2, :full_left, 'foo', 'full_left')
+    check_comparison_operator_for_member(s, s2, :full_right, 'foo', 'full_right')
+    check_comparison_operator_for_member(s, s2, :top, 'foo', 'top')
+    check_comparison_operator_for_member(s, s2, :extra, 'foo', 'extra')
   end
 
   it 'raises an error when created with an unknown parameter' do

@@ -21,13 +21,10 @@ RSpec.describe(Symgate::Auth::User) do
 
   it 'allows comparison with another User' do
     u = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
-    u2 = Symgate::Auth::User.new(user_id: 'bar/baz', is_group_admin: false)
+    u2 = u.dup
 
-    expect(u == u2).to be_falsey
-    u2.is_group_admin = true
-    expect(u == u2).to be_falsey
-    u2.user_id = 'foo/bar'
-    expect(u == u2).to be_truthy
+    check_comparison_operator_for_member(u, u2, :user_id, 'baz/qux', 'foo/bar')
+    check_comparison_operator_for_member(u, u2, :is_group_admin, false, true)
   end
 
   it 'raises an error when created with an unknown parameter' do

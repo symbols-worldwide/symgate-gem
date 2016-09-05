@@ -4,15 +4,6 @@ require 'symgate/wordlist/graphic_attachment'
 require 'base64'
 
 RSpec.describe(Symgate::Wordlist::GraphicAttachment) do
-  def get_kitten(variation = :default)
-    File.open(case variation
-              when :alternate
-                'test/spec/fixtures/kitten_2.jpg'
-              else
-                'test/spec/fixtures/kitten.jpg'
-              end, 'rb').read
-  end
-
   it 'allows access to type, uuid and data' do
     k = get_kitten
     u = '7d18fe70-5342-0134-9ec0-20cf302b46f2'
@@ -46,24 +37,15 @@ RSpec.describe(Symgate::Wordlist::GraphicAttachment) do
     u2 = '910a4870-5342-0134-9ec0-20cf302b46f2'
     k2 = get_kitten :alternate
 
-    d = Symgate::Wordlist::GraphicAttachment.new(type: 'image/jpeg',
+    g = Symgate::Wordlist::GraphicAttachment.new(type: 'image/jpeg',
                                                  uuid: u,
                                                  data: k)
 
-    d2 = Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
-                                                  uuid: u2,
-                                                  data: k2)
+    g2 = g.dup
 
-    expect(d == d2).to be_falsey
-
-    d2.type = 'image/jpeg'
-    expect(d == d2).to be_falsey
-
-    d2.uuid = u
-    expect(d == d2).to be_falsey
-
-    d2.data = k
-    expect(d == d2).to be_truthy
+    check_comparison_operator_for_member(g, g2, :type, 'image/png', 'image/jpeg')
+    check_comparison_operator_for_member(g, g2, :uuid, u2, u)
+    check_comparison_operator_for_member(g, g2, :data, k2, k)
   end
 
   it 'raises an error when created with an unknown parameter' do

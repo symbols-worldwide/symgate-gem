@@ -35,3 +35,20 @@ def user_password_creds(account, user, password)
     'auth:user': { 'auth:id': user,
                    'auth:password': password } }
 end
+
+def get_kitten(variation = :default)
+  File.open(case variation
+            when :alternate
+              'test/spec/fixtures/kitten_2.jpg'
+            else
+              'test/spec/fixtures/kitten.jpg'
+            end, 'rb').read
+end
+
+def check_comparison_operator_for_member(o1, o2, member, bad_value, good_value)
+  expect(o1 == o2).to be_a(TrueClass)
+  o2.instance_variable_set("@#{member}", bad_value)
+  expect(o1 == o2).to be_a(FalseClass)
+  o2.instance_variable_set("@#{member}", good_value)
+  expect(o1 == o2).to be_a(TrueClass)
+end
