@@ -13,7 +13,7 @@ Metrics/MethodLength:
   Max: 12
 
 Style/NumericLiterals:
-  Enabled: false
+  MinDigits: 6
 
 Metrics/ClassLength:
   Max: 120
