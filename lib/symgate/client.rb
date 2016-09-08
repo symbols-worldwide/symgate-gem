@@ -132,11 +132,17 @@ module Symgate
     end
 
     def check_array_for_type(ary, type_name)
+      raise Symgate::Error, "#{ary.class.name} is not an array" unless ary.is_a? Array
+
       ary.each do |item|
         unless item.is_a? type_name
-          raise Symgate::Error, "'#{item.inspect}' is not a #{type_name.name}"
+          raise Symgate::Error, "'#{item.class.name}' is not a #{type_name.name}"
         end
       end
+    end
+
+    def check_for_multiple_opts(keys, opts)
+      raise Symgate::Error, "Supply only one of 'match' or 'entry'" if keys.all? { |k| opts.key? k }
     end
   end
 end
