@@ -1,4 +1,5 @@
 require 'base64'
+require 'symgate/wordlist/info'
 
 module Symgate
   module Wordlist
