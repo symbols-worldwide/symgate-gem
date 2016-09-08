@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://ws.widgit.com/schema/globaltypes/1.2"
+  xmlns:cml2="http://ws.widgit.com/schema/cml/2.0"
+  xmlns:wl1x2="http://ws.widgit.com/schema/wordlist/1.2"
+  xmlns:auth="http://ws.widgit.com/schema/auth/1.2"
+  xmlns:symboliser1x2="http://ws.widgit.com/schema/symboliser/1.2">
+ <SOAP-ENV:Body>
+  <symboliser1x2:getWordlistEntriesResponse>
+   <wl1x2:wordlistentry>
+    <wl1x2:word>cat</wl1x2:word>
+    <wl1x2:priority>1</wl1x2:priority>
+    <wl1x2:uuid>7bdc3511-6cb8-4d7b-9179-380afced746d</wl1x2:uuid>
+    <cml2:symbol symset="User">
+     <cml2:main>cat.svg</cml2:main>
+    </cml2:symbol>
+    <wl1x2:lastchange>2012-10-10T10:10:10Z</wl1x2:lastchange>
+   </wl1x2:wordlistentry>
+  </symboliser1x2:getWordlistEntriesResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

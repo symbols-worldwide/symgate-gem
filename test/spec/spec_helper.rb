@@ -3,6 +3,8 @@ require 'savon/mock/spec_helper'
 require 'simplecov'
 require 'simplecov-teamcity-summary'
 
+# rubocop:disable Style/AccessorMethodName
+
 SimpleCov.start do
   minimum_coverage 100
 
@@ -43,6 +45,10 @@ def get_kitten(variation = :default)
             else
               'test/spec/fixtures/kitten.jpg'
             end, 'rb').read
+end
+
+def get_cfwl
+  File.open('test/spec/fixtures/test.cfwl', 'rb').read
 end
 
 def check_comparison_operator_for_member(o1, o2, member, bad_value, good_value)

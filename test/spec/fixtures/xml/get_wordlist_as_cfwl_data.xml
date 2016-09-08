@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://ws.widgit.com/schema/globaltypes/1.2"
+  xmlns:cml2="http://ws.widgit.com/schema/cml/2.0"
+  xmlns:wl1x2="http://ws.widgit.com/schema/wordlist/1.2"
+  xmlns:auth="http://ws.widgit.com/schema/auth/1.2"
+  xmlns:symboliser1x2="http://ws.widgit.com/schema/symboliser/1.2">
+ <SOAP-ENV:Body>
+  <symboliser1x2:getWordlistAsCfwlDataResponse>
+   <cfwl>
+    BwAAAA4AAAD/////AAAAANcAAAD///////////////+nAQAA//////////8s
+    AgAA//////////9yAgAA/////wEAAAAFAAAAwQAAAHQAcgBhAHMAaAAAAAAK
+    AHQAcgBhAHMAaP////8AAAAAo4yyF2UrR3q8cqCI8jRpJwAAAAEAAAAA////
+    //////////////////////////////////////8AAABeACQAKABXAGkAZABS
+    AGUAcwApAC8AZwByAGEAcABoAGkAYwBzAC8AdwBpAGQAZwBpAHQAIAByAGUA
+    YgB1AHMALwByAC8AcgBlAGMAeQBjAGwAZQAgADEALgBlAG0AZgAAAAAAJYAo
+    AoxG4P8AAAAAAgAAABgAAABQAAAAdwBvAHIAZABsAGkAcwB0ADoAOgBtAGUA
+    dABhAGQAYQB0AGEAOgA6AHUAdQBpAGQAAAAATAB7ADkAZQA1ADIAMQBlADIA
+    NwAtAGIAYwA1ADIALQA0ADgAZAAzAC0AOAAzADkAYQAtADYANwA5AGQANQAz
+    ADQAOAAxADkAMAA3AH0YAAAADAAAAHcAbwByAGQAbABpAHMAdAA6ADoAbQBl
+    AHQAYQBkAGEAdABhADoAOgBuAGEAbQBlAAAAAAgAdABlAHMAdAIAAAAZAAAA
+    CQAAAHcAbwByAGQAbABpAHMAdAA6ADoAbQBlAHQAYQBkAGEAdABhADoAOgBt
+    AHQAaQBtAGUAACWAKAKMfAT/GQAAAAQAAAB3AG8AcgBkAGwAaQBzAHQAOgA6
+    AG0AZQB0AGEAZABhAHQAYQA6ADoAYwBvAHUAbgB0AAAAAAEBAAAAGwAAAAQA
+    AAB3AG8AcgBkAGwAaQBzAHQAOgA6AG0AZQB0AGEAZABhAHQAYQA6ADoAcwBy
+    AGMAaABhAHMAaAD/////AQAAACYAAADBAAAAewBhADMAOABjAGIAMgAxADcA
+    LQA2ADUAMgBiAC0ANAA3ADcAYQAtAGIAYwA3ADIALQBhADAAOAA4AGYAMgAz
+    ADQANgA5ADIANwB9AAAAAAoAdAByAGEAcwBo/////wAAAACjjLIXZStHerxy
+    oIjyNGknAAAAAQAAAAD/////////////////////////////////////////
+    /wAAAF4AJAAoAFcAaQBkAFIAZQBzACkALwBnAHIAYQBwAGgAaQBjAHMALwB3
+    AGkAZABnAGkAdAAgAHIAZQBiAHUAcwAvAHIALwByAGUAYwB5AGMAbABlACAA
+    MQAuAGUAbQBmAAAAAAAlgCgCjEbg/wAAAABZOwAA
+   </cfwl>
+  </symboliser1x2:getWordlistAsCfwlDataResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
