@@ -16,18 +16,6 @@ module Symgate
         )
       end
 
-      def to_soap
-        {
-          name: @name,
-          context: @context,
-          uuid: @uuid,
-          engine: @engine,
-          scope: @scope,
-          entrycount: @entrycount,
-          lastchange: @lastchange.to_s
-        }
-      end
-
       def to_s
         "{#{@context} Wordlist: \"#{@name}\"/#{@uuid} (#{@engine}, #{@entry_count} entries)}"
       end
