@@ -1,6 +1,7 @@
 require 'symgate/cml/symbol'
 require 'symgate/type'
 require 'symgate/client'
+require 'tryit'
 
 module Symgate
   module Wordlist
@@ -10,7 +11,7 @@ module Symgate
         Symgate::Wordlist::Entry.new(
           word: hash_value_with_optional_namespace(:wl, :word, hash),
           uuid: hash_value_with_optional_namespace(:wl, :uuid, hash),
-          priority: hash_value_with_optional_namespace(:wl, :priority, hash),
+          priority: hash_value_with_optional_namespace(:wl, :priority, hash).to_i,
           concept_code: hash_value_with_optional_namespace(:wl, :conceptcode, hash),
           symbols: Symgate::Client.savon_array(hash, :symbol,
                                                Symgate::Cml::Symbol),
@@ -25,11 +26,11 @@ module Symgate
           'wl:word': word,
           'wl:uuid': uuid,
           'wl:priority': priority,
-          'wl:conceptcode': concept_code.to_s == '' ? nil : concept_code,
-          'cml:symbol': @symbols.map(&to_soap),
-          'wl:customgraphic': @custom_graphics.map(&to_soap),
-          'wl:lastchange': last_change
-        }.compact
+          'wl:conceptcode': concept_code.empty? ? nil : concept_code,
+          'cml:symbol': @symbols.tryit { map(&:to_soap) },
+          'wl:customgraphic': @custom_graphics.tryit { map(&:to_soap) },
+          'wl:lastchange': last_change.to_s
+        }.delete_if { |_, v| v.nil? }
       end
 
       def to_s

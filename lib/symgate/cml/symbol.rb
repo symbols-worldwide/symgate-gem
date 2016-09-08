@@ -31,7 +31,7 @@ module Symgate
           'cml:full_right': full_right,
           'cml:top': top,
           'cml:extra': extra
-        }.compact
+        }.delete_if { |_, v| v.nil? }
       end
 
       def to_s
