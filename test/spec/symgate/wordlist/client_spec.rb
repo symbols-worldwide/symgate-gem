@@ -275,6 +275,17 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.last_change).to be_a(DateTime)
       expect(resp.engine).to eq('sql')
     end
+
+    it 'retries 3 times on failure' do
+      3.times do
+        savon.expects(:create_wordlist)
+             .with(message: :any)
+             .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
+      end
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.create_wordlist('foo', 'bar', 'baz') }.to raise_error(Symgate::Error)
+    end
   end
 
   describe '#destroy_wordlist' do
@@ -287,6 +298,18 @@ RSpec.describe(Symgate::Wordlist::Client) do
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
 
       expect { client.destroy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716') }.not_to raise_error
+    end
+
+    it 'retries 3 times on failure' do
+      3.times do
+        savon.expects(:destroy_wordlist)
+             .with(message: :any)
+             .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
+      end
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.destroy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716') }
+        .to raise_error(Symgate::Error)
     end
   end
 
