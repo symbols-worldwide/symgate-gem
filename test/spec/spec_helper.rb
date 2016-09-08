@@ -24,7 +24,11 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    savon.unmock!
+    begin
+      savon.expectations.each(&:verify!)
+    ensure
+      savon.unmock!
+    end
   end
 end
 
