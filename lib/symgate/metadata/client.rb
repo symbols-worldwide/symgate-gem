@@ -42,7 +42,9 @@ module Symgate
         check_array_for_type(i, Symgate::Metadata::DataItem)
         raise Symgate::Error, 'No items supplied' if i.empty?
 
-        savon_request(:set_metadata) { |soap| soap.message('auth:data_item': i.map(&:to_soap)) }
+        savon_request(:set_metadata, returns_error_string: true) do |soap|
+          soap.message('auth:data_item': i.map(&:to_soap))
+        end
       end
 
       # Destroys one or more metadata items on the specified scope, specified by
@@ -53,7 +55,17 @@ module Symgate
         check_array_for_type(k, String)
         raise Symgate::Error, 'No keys supplied' if k.empty?
 
-        savon_request(:destroy_metadata) { |soap| soap.message(scope: scope, key: k) }
+        savon_request(:destroy_metadata, returns_error_string: true) do |soap|
+          soap.message(scope: scope, key: k)
+        end
+      end
+
+      private
+
+      def parse_get_metadata_opts(opts)
+        arrayize_option(:key, :keys, opts)
+        check_option_is_array_of(String, :keys, opts)
+        check_for_unknown_opts(%i(keys scope), opts)
       end
     end
   end

@@ -101,12 +101,6 @@ module Symgate
       raise Symgate::Error, e unless e.to_s == ''
     end
 
-    def parse_get_metadata_opts(opts)
-      arrayize_option(:key, :keys, opts)
-      check_option_is_array_of(String, :keys, opts)
-      check_for_unknown_opts(%i(keys scope), opts)
-    end
-
     def arrayize_option(singular, plural, opts)
       if opts.include? singular # else nothing to do
         if opts.include? plural
