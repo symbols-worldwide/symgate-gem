@@ -7,17 +7,23 @@ module Symgate
     def initialize(opts = {})
       attrs = attributes
       self.class.class_eval { attr_accessor(*attrs) }
-      opts.each do |key, value|
+      opts.each do |key, _value|
         unless attributes.include? key
           raise Symgate::Error, "Unknown option #{key} for #{self.class.name}"
         end
-        instance_variable_set "@#{key}", value
+      end
+
+      attributes.each do |attribute|
+        instance_variable_set "@#{attribute}", opts[attribute]
       end
     end
 
     def ==(other)
-      attributes.all? do |a|
-        other.instance_variable_get("@#{a}") == instance_variable_get("@#{a}")
+      attributes.all? do |attribute|
+        a = other.instance_variable_get("@#{attribute}")
+        b = instance_variable_get("@#{attribute}")
+
+        a == b || values_are_empty([a, b])
       end
     end
 
@@ -40,6 +46,10 @@ module Symgate
       else
         value
       end
+    end
+
+    def values_are_empty(values)
+      values.all? { |v| value_or_nil(v).nil? }
     end
   end
 end
