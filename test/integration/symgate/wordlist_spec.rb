@@ -931,4 +931,91 @@ RSpec.describe(Symgate::Wordlist::Client) do
       )
     end
   end
+
+  describe '#create_wordlist_from_cfwl_data' do
+    it 'creates a wordlist from a cfwl file and generates a uuid' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          false
+        )
+      end.not_to raise_error
+
+      expect(uuid).not_to eq('{9e521e27-bc52-48d3-839a-679d53481907}')
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(1)
+      expect(client.get_wordlist_info(uuid).context).to eq('Topic')
+
+      expect(client.get_wordlist_entries(uuid).first.word).to eq('trash')
+    end
+
+    it 'preserves the uuid when requested' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          true
+        )
+      end.not_to raise_error
+
+      expect(uuid).to eq('{9e521e27-bc52-48d3-839a-679d53481907}')
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(1)
+      expect(client.get_wordlist_info(uuid).context).to eq('Topic')
+
+      expect(client.get_wordlist_entries(uuid).first.word).to eq('trash')
+    end
+
+    it 'raises an error when trying to preserve a uuid that already exists' do
+      expect do
+        client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          true
+        )
+      end.not_to raise_error
+
+      expect do
+        client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          true
+        )
+      end.to raise_error(Symgate::Error)
+
+      expect do
+        client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          false
+        )
+      end.not_to raise_error
+    end
+  end
+
+  describe '#get_wordlist_as_cfwl_data' do
+    it 'raises an error if the wordlist does not exist' do
+      expect { client.get_wordlist_as_cfwl_data('9e521e27-bc52-48d3-839a-679d53481907') }
+        .to raise_error(Symgate::Error)
+    end
+
+    it 'returns a blob of data representing the cfwl file' do
+      expect do
+        client.create_wordlist_from_cfwl_data(
+          get_cfwl,
+          'Topic',
+          true
+        )
+      end.not_to raise_error
+
+      data = nil
+
+      expect { data = client.get_wordlist_as_cfwl_data('9e521e27-bc52-48d3-839a-679d53481907') }
+        .not_to raise_error
+
+      # can't verify data because the timestamps change, but this is good enough
+      expect(data.length).to eq(get_cfwl.length)
+    end
+  end
 end
