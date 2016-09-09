@@ -547,4 +547,388 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
     end
   end
+
+  describe '#get_wordlist_entries' do
+    it 'raises an error if the wordlist does not exist' do
+      expect { client.get_wordlist_entries('789bfe3d-9b81-48de-9fc0-5507318b6ab3') }
+        .to raise_error(Symgate::Error)
+    end
+
+    it 'returns a list of all wordlist entries' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'bar',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.now
+
+      expect(reset_wordlist_entry_times(client.get_wordlist_entries(uuid), dt)).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ],
+            last_change: dt
+          ),
+          Symgate::Wordlist::Entry.new(
+            word: 'bar',
+            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'bar.svg')
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+
+    it 'excludes attachments by default' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ],
+              custom_graphics: [
+                Symgate::Wordlist::GraphicAttachment.new(
+                  type: 'image/jpeg',
+                  uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                  data: get_kitten
+                )
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'bar',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.now
+
+      expect(reset_wordlist_entry_times(
+               client.get_wordlist_entries(uuid),
+               dt
+      )).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ],
+            last_change: dt
+          ),
+          Symgate::Wordlist::Entry.new(
+            word: 'bar',
+            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'bar.svg')
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+
+    it 'accepts an option to include attachments' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ],
+              custom_graphics: [
+                Symgate::Wordlist::GraphicAttachment.new(
+                  type: 'image/jpeg',
+                  uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                  data: get_kitten
+                )
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'bar',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.new
+
+      expect(reset_wordlist_entry_times(
+               client.get_wordlist_entries(uuid,
+                                           attachments: true),
+               dt
+      )).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ],
+            custom_graphics: [
+              Symgate::Wordlist::GraphicAttachment.new(
+                type: 'image/jpeg',
+                uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
+                data: get_kitten
+              )
+            ],
+            last_change: dt
+          ),
+          Symgate::Wordlist::Entry.new(
+            word: 'bar',
+            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'bar.svg')
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+
+    it 'accepts an option to filter by word' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ],
+              custom_graphics: [
+                Symgate::Wordlist::GraphicAttachment.new(
+                  type: 'image/jpeg',
+                  uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                  data: get_kitten
+                )
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'dog',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'dog',
+              uuid: 'abbbf3b7-0437-4899-adea-d9f911216674',
+              priority: 1,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'baz.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.now
+
+      expect(reset_wordlist_entry_times(
+               client.get_wordlist_entries(uuid,
+                                           match: 'dog'),
+               dt
+      )).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'dog',
+            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'bar.svg')
+            ],
+            last_change: dt
+          ),
+          Symgate::Wordlist::Entry.new(
+            word: 'dog',
+            uuid: '{abbbf3b7-0437-4899-adea-d9f911216674}',
+            priority: 1,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'baz.svg')
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+
+    it 'accepts an option to filter by conceptcode' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ],
+              custom_graphics: [
+                Symgate::Wordlist::GraphicAttachment.new(
+                  type: 'image/jpeg',
+                  uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                  data: get_kitten
+                )
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'bar',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.now
+
+      expect(reset_wordlist_entry_times(
+               client.get_wordlist_entries(uuid,
+                                           entry: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}'),
+               dt
+      )).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+
+    it 'accepts options to filter and to return attachments at the same time' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ],
+              custom_graphics: [
+                Symgate::Wordlist::GraphicAttachment.new(
+                  type: 'image/jpeg',
+                  uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                  data: get_kitten
+                )
+              ]
+            ),
+            Symgate::Wordlist::Entry.new(
+              word: 'bar',
+              uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'bar.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+
+      dt = DateTime.now
+
+      expect(reset_wordlist_entry_times(
+               client.get_wordlist_entries(uuid,
+                                           entry: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+                                           attachments: true),
+               dt
+      )).to match_array(
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ],
+            custom_graphics: [
+              Symgate::Wordlist::GraphicAttachment.new(
+                type: 'image/jpeg',
+                uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
+                data: get_kitten
+              )
+            ],
+            last_change: dt
+          )
+        ]
+      )
+    end
+  end
 end

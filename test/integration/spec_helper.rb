@@ -1,6 +1,7 @@
 require 'rspec'
 require 'mysql2'
 require 'savon'
+require 'symgate/wordlist/entry'
 
 # rubocop:disable Style/AccessorMethodName
 
@@ -66,4 +67,11 @@ def check_comparison_operator_for_member(o1, o2, member, bad_value, good_value)
   expect(o1 == o2).to be_a(FalseClass)
   o2.instance_variable_set("@#{member}", good_value)
   expect(o1 == o2).to be_a(TrueClass)
+end
+
+def reset_wordlist_entry_times(array, datetime)
+  array.map do |entry|
+    entry.last_change = datetime
+    entry
+  end
 end
