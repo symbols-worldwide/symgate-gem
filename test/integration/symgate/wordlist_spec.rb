@@ -492,4 +492,59 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(entry.uuid).to match(/^{[0-9a-f-]{36}}$/)
     end
   end
+
+  describe '#remove_wordlist_entry' do
+    it 'raises an error if the wordlist does not exist' do
+      expect do
+        client.remove_wordlist_entry(
+          'fe5a7237-6594-4a8c-93f5-de26b926aefa',
+          'd0621aac-e2f4-4bd1-b2a9-2e21c2b1ed0c'
+        )
+      end.to raise_error(Symgate::Error)
+    end
+
+    # TODO: The API treats this as success. Is this what we want?
+    # it 'raises an error if the entry does not exist' do
+    #   uuid = nil
+    #   expect { uuid = client.create_wordlist('foo', 'User').uuid }.not_to raise_error
+    #   expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
+    #
+    #   expect do
+    #     client.remove_wordlist_entry(
+    #       uuid,
+    #       'd0621aac-e2f4-4bd1-b2a9-2e21c2b1ed0c'
+    #     )
+    #   end.to raise_error(Symgate::Error)
+    # end
+
+    it 'removes a wordlist entry' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist(
+          'foo',
+          'User',
+          [
+            Symgate::Wordlist::Entry.new(
+              word: 'cat',
+              uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+              priority: 0,
+              symbols: [
+                Symgate::Cml::Symbol.new(main: 'foo.svg')
+              ]
+            )
+          ]
+        ).uuid
+      end.not_to raise_error
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(1)
+
+      expect do
+        client.remove_wordlist_entry(
+          uuid,
+          client.get_wordlist_entries(uuid).first.uuid
+        )
+      end.not_to raise_error
+
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
+    end
+  end
 end
