@@ -2,6 +2,8 @@ require 'rspec'
 require 'mysql2'
 require 'savon'
 
+# rubocop:disable Style/AccessorMethodName
+
 def integration_mysql_client
   Mysql2::Client.new(host: '127.0.0.1',
                      port: 33306,
@@ -43,4 +45,25 @@ def user_token_client_of_type(client_type, user, token)
                   token: token,
                   endpoint: 'http://localhost:11122/',
                   savon_opts: savon_opts)
+end
+
+def get_kitten(variation = :default)
+  File.open(case variation
+            when :alternate
+              'test/integration/fixtures/kitten_2.jpg'
+            else
+              'test/integration/fixtures/kitten.jpg'
+            end, 'rb').read
+end
+
+def get_cfwl
+  File.open('test/integration/fixtures/test.cfwl', 'rb').read
+end
+
+def check_comparison_operator_for_member(o1, o2, member, bad_value, good_value)
+  expect(o1 == o2).to be_a(TrueClass)
+  o2.instance_variable_set("@#{member}", bad_value)
+  expect(o1 == o2).to be_a(FalseClass)
+  o2.instance_variable_set("@#{member}", good_value)
+  expect(o1 == o2).to be_a(TrueClass)
 end

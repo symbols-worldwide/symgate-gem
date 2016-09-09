@@ -369,4 +369,127 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(entries.count { |entry| entry.word == 'quux' }).to eq(1)
     end
   end
+
+  describe '#insert_wordlist_entry' do
+    it 'raises an error if the wordlist does not exist' do
+      expect do
+        client.insert_wordlist_entry(
+          '656c8dcb-3aa3-44a3-96d6-e7d11e3f37a4',
+          Symgate::Wordlist::Entry.new(
+            word: 'baz',
+            uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'baz.svg')
+            ]
+          )
+        )
+      end.to raise_error(Symgate::Error)
+    end
+
+    it 'inserts a wordlist entry' do
+      uuid = nil
+      expect { uuid = client.create_wordlist('foo', 'User').uuid }.not_to raise_error
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
+
+      expect do
+        client.insert_wordlist_entry(
+          uuid,
+          Symgate::Wordlist::Entry.new(
+            word: 'baz',
+            uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'baz.svg')
+            ]
+          )
+        )
+      end.not_to raise_error
+
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(1)
+
+      entry = nil
+      expect { entry = client.get_wordlist_entries(uuid).first }.not_to raise_error
+
+      expect(entry.word).to eq('baz')
+      expect(entry.uuid).to eq('{8779812d-2293-454f-b299-47e8dee4fa8f}')
+      expect(entry.priority).to eq(0)
+      expect(entry.symbols).to match_array(
+        [
+          Symgate::Cml::Symbol.new(main: 'baz.svg')
+        ]
+      )
+      expect(entry.custom_graphics).to match_array([])
+      expect(entry.last_change).to be_a(DateTime)
+      expect(entry.last_change).to be > DateTime.now - 30
+    end
+
+    it 'inserts an entry with a binary attachment' do
+      uuid = nil
+      expect { uuid = client.create_wordlist('foo', 'User').uuid }.not_to raise_error
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
+
+      expect do
+        client.insert_wordlist_entry(
+          uuid,
+          Symgate::Wordlist::Entry.new(
+            word: 'baz',
+            uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
+            priority: 0,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'baz.svg')
+            ],
+            custom_graphics: [
+              Symgate::Wordlist::GraphicAttachment.new(
+                type: 'image/jpeg',
+                uuid: 'b563f100-08c2-428d-afdb-302f0f7608d9',
+                data: get_kitten
+              )
+            ]
+          )
+        )
+      end.not_to raise_error
+
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(1)
+
+      entry = nil
+      expect { entry = client.get_wordlist_entries(uuid, attachments: true).first }
+        .not_to raise_error
+
+      expect(entry.word).to eq('baz')
+      expect(entry.uuid).to eq('{8779812d-2293-454f-b299-47e8dee4fa8f}')
+      expect(entry.priority).to eq(0)
+
+      expect(entry.custom_graphics).to match_array(
+        [
+          Symgate::Wordlist::GraphicAttachment.new(
+            type: 'image/jpeg',
+            uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
+            data: get_kitten
+          )
+        ]
+      )
+    end
+
+    it 'automatically generates uuids for entries with no uuid' do
+      uuid = nil
+      expect { uuid = client.create_wordlist('foo', 'User').uuid }.not_to raise_error
+      expect(client.get_wordlist_info(uuid).entry_count).to eq(0)
+
+      expect do
+        client.insert_wordlist_entry(
+          uuid,
+          Symgate::Wordlist::Entry.new(
+            word: 'baz',
+            priority: 0
+          )
+        )
+      end.not_to raise_error
+
+      entry = nil
+      expect { entry = client.get_wordlist_entries(uuid).first }.not_to raise_error
+
+      expect(entry.uuid).to match(/^{[0-9a-f-]{36}}$/)
+    end
+  end
 end
