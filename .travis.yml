@@ -6,3 +6,6 @@ rvm:
 
 git:
   submodules: false
+
+before_install:
+  - gem install bundler
