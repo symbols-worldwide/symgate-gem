@@ -24,13 +24,12 @@ module Symgate
 
       # creates a wordlist with the specified name, context and scope (see auth:scope).
       # optionally, supply a list of entries to form the wordlist's initial content
-      def create_wordlist(name, context, scope, entries = [])
+      def create_wordlist(name, context, entries = [])
         tries ||= 3 # TODO: Find it if we still need to do this!
 
         Symgate::Wordlist::Info.from_soap(
           savon_request(:create_wordlist) do |soap|
-            soap.message(name: name, context: context, scope: scope,
-                         'wl:wordlistentry': entries.map(&:to_soap))
+            soap.message(soap_params_for_create_wordlist(name, context, entries))
           end.body[:create_wordlist_response][:wordlistinfo]
         )
       rescue Symgate::Error => e
@@ -136,6 +135,29 @@ module Symgate
                        context: context,
                        preserve_uuid: preserve_uuid)
         end.body[:create_wordlist_from_cfwl_data_response][:uuid]
+      end
+
+      private
+
+      def scope_for_context(context)
+        case context.to_s
+        when 'Topic', 'SymbolSet'
+          'Group'
+        when 'Lexical'
+          'Account'
+        else
+          'User'
+        end
+      end
+
+      def soap_params_for_create_wordlist(name, context, entries)
+        {
+          name: name,
+          context: context,
+          scope: scope_for_context(context)
+        }.merge(
+          entries ? { 'wl:wordlistentry': entries.map(&:to_soap) } : {}
+        )
       end
     end
   end

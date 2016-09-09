@@ -123,7 +123,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
 
       resp = nil
-      expect { resp = client.create_wordlist('foo', 'User', 'User') }.not_to raise_error
+      expect { resp = client.create_wordlist('foo', 'User') }.not_to raise_error
 
       expect(resp).to be_a(Symgate::Wordlist::Info)
       expect(resp.name).to eq('foo')
@@ -170,7 +170,6 @@ RSpec.describe(Symgate::Wordlist::Client) do
       resp = nil
       expect do
         resp = client.create_wordlist('foo',
-                                      'User',
                                       'User',
                                       [
                                         Symgate::Wordlist::Entry.new(
@@ -242,7 +241,6 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect do
         resp = client.create_wordlist('foo',
                                       'User',
-                                      'User',
                                       [
                                         Symgate::Wordlist::Entry.new(
                                           word: 'cat',
@@ -284,7 +282,48 @@ RSpec.describe(Symgate::Wordlist::Client) do
       end
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect { client.create_wordlist('foo', 'bar', 'baz') }.to raise_error(Symgate::Error)
+      expect { client.create_wordlist('foo', 'bar') }.to raise_error(Symgate::Error)
+    end
+
+    it 'sends group scope when using topic or sybol-set wordlists' do
+      savon.expects(:create_wordlist)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            name: 'foo',
+                            context: 'User',
+                            scope: 'User' })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      savon.expects(:create_wordlist)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            name: 'foo',
+                            context: 'Topic',
+                            scope: 'Group' })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      savon.expects(:create_wordlist)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            name: 'foo',
+                            context: 'SymbolSet',
+                            scope: 'Group' })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.create_wordlist('foo', 'User') }.not_to raise_error
+      expect { client.create_wordlist('foo', 'Topic') }.not_to raise_error
+      expect { client.create_wordlist('foo', 'SymbolSet') }.not_to raise_error
+    end
+
+    it 'sends account scope when using lexical wordlists' do
+      # note, currently you can't actually do this with the API, so it's raising an error
+      savon.expects(:create_wordlist)
+           .with(message: { 'auth:creds': user_password_creds('foo', 'foo/bar', 'baz'),
+                            name: 'foo',
+                            context: 'Lexical',
+                            scope: 'Account' })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      expect { client.create_wordlist('foo', 'Lexical') }.not_to raise_error
     end
   end
 
