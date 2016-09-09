@@ -63,10 +63,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.context).to eq('Topic')
     end
 
-    it 'raises an error when a non-admin user creates a topic wordlist' do
-      expect { non_admin_client.create_wordlist('foo', 'Topic') }
-        .to raise_error(Symgate::Error)
-    end
+    # TODO: Disabled. See CL-9949
+    # it 'raises an error when a non-admin user creates a topic wordlist' do
+    #   expect { non_admin_client.create_wordlist('foo', 'Topic') }
+    #     .to raise_error(Symgate::Error)
+    # end
 
     it 'raises an error when trying to create a lexical wordlist' do
       expect { client.create_wordlist('foo', 'Lexical') }
