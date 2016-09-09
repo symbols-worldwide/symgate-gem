@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['simon@widgit.com']
 
   spec.summary       = "Wrapper around Widgit's Symgate SOAP symboliser"
-  spec.homepage      = 'https://github.com/symbols-worldwide/symgate'
+  spec.homepage      = 'https://github.com/symbols-worldwide/symgate-gem'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f|
     f.match(%r{^(test|spec|features)/})
