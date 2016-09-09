@@ -75,6 +75,6 @@ RSpec.describe(Symgate::Wordlist::GraphicAttachment) do
                                                  uuid: u,
                                                  data: k)
 
-    expect(d.to_soap[:data]).to eq(Base64.encode64(k))
+    expect(d.to_soap[:'wl:data']).to eq(Base64.encode64(k))
   end
 end

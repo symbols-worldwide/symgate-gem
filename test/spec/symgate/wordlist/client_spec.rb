@@ -572,9 +572,9 @@ RSpec.describe(Symgate::Wordlist::Client) do
                                 'cml:main': 'foo.svg'
                               }],
                               'wl:customgraphic': [{
-                                type: 'image/jpeg',
-                                uuid: '76300f2a-c12e-40a7-9759-979e8453fe9d',
-                                data: Base64.encode64(get_kitten)
+                                'wl:type': 'image/jpeg',
+                                'wl:uuid': '76300f2a-c12e-40a7-9759-979e8453fe9d',
+                                'wl:data': Base64.encode64(get_kitten)
                               }]
                             } })
            .returns(File.read('test/spec/fixtures/xml/insert_wordlist_entry.xml'))

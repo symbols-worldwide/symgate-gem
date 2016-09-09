@@ -17,9 +17,9 @@ module Symgate
 
       def to_soap
         {
-          type: @type,
-          uuid: @uuid,
-          data: @data ? Base64.encode64(@data) : nil
+          'wl:type': @type,
+          'wl:uuid': @uuid,
+          'wl:data': @data ? Base64.encode64(@data) : nil
         }
       end
 
