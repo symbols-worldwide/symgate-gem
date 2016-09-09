@@ -27,7 +27,7 @@ module Symgate
       # creates a wordlist with the specified name, context and scope (see auth:scope).
       # optionally, supply a list of entries to form the wordlist's initial content
       def create_wordlist(name, context, entries = [])
-        tries ||= 3 # TODO: Find it if we still need to do this!
+        tries ||= 3 # TODO: Find out if we still need to do this!
 
         Symgate::Wordlist::Info.from_soap(
           savon_request(:create_wordlist) do |soap|
