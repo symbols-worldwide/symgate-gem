@@ -1,7 +1,8 @@
 require 'rspec'
 require 'savon/mock/spec_helper'
 require 'simplecov'
-require 'simplecov-teamcity-summary'
+require 'simplecov-teamcity-summary' if ENV['TEAMCITY_VERSION']
+require 'codecov' if ENV['TRAVIS']
 
 # rubocop:disable Style/AccessorMethodName
 
@@ -14,6 +15,8 @@ SimpleCov.start do
       SimpleCov.result.format!
     end
   end
+
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov if ENV['TRAVIS']
 end
 
 RSpec.configure do |config|
