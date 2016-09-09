@@ -33,5 +33,13 @@ module Symgate
       raise Symgate::Error, "No attributes defined for object type #{self.class.name}"
     end
     # :nocov:
+
+    def value_or_nil(value)
+      if value.respond_to?(:empty?) ? value.empty? : !value
+        nil
+      else
+        value
+      end
+    end
   end
 end

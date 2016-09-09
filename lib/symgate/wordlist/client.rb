@@ -1,4 +1,6 @@
 require 'base64'
+require 'symgate/client'
+require 'symgate/error'
 require 'symgate/wordlist/info'
 
 module Symgate
