@@ -1,5 +1,12 @@
 # Symgate - Ruby client for the Widgit symbolisation service
 
+[![Build Status](https://travis-ci.org/symbols-worldwide/symgate-gem.svg?branch=master)](https://travis-ci.org/symbols-worldwide/symgate-gem)
+[![Code Climate](https://codeclimate.com/github/symbols-worldwide/symgate-gem.svg)](https://codeclimate.com/github/symbols-worldwide/symgate-gem)
+[![codecov.io](http://codecov.io/github/symbols-worldwide/symgate-gem/coverage.svg?branch=master)](http://codecov.io/github/symbols-worldwide/symgate-gem?branch=master)
+[![Dependency Status](https://gemnasium.com/badges/github.com/symbols-worldwide/symgate-gem.svg)](https://gemnasium.com/github.com/symbols-worldwide/symgate-gem)
+[![Gem Version](https://badge.fury.io/rb/symgate.svg)](https://badge.fury.io/rb/symgate)
+[![Apache License](https://img.shields.io/github/license/symbols-worldwide/symgate-gem.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
 This gem provides a wrapper around the [Symgate SOAP API](https://ws.widgitonline.com/schema/symboliser.wsdl),
 providing a simple Ruby interface that matches the remote API as much as possible.
 
