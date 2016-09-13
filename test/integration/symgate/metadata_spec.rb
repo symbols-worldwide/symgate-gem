@@ -36,7 +36,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User')
         ]
       )
     end
@@ -46,8 +46,8 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('baz', 'qux', 'User') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
         ]
       )
     end
@@ -57,7 +57,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('baz', 'qux', 'Group') }.not_to raise_error
       expect(client.get_metadata(scope: 'Group')).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
         ]
       )
     end
@@ -67,7 +67,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('baz', 'qux', 'Group') }.not_to raise_error
       expect(client.get_metadata(key: 'baz')).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
         ]
       )
     end
@@ -78,8 +78,8 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('garply', 'thud', 'Group') }.not_to raise_error
       expect(client.get_metadata(keys: %w(foo baz))).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
         ]
       )
     end
@@ -94,7 +94,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User')
         ]
       )
     end
@@ -103,7 +103,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Group')
         ]
       )
     end
@@ -129,7 +129,7 @@ RSpec.describe(Symgate::Metadata::Client) do
 
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Account')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account')
         ]
       )
     end
@@ -153,7 +153,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'baz', 'Group') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'baz', scope: 'Group')
         ]
       )
     end
@@ -163,12 +163,12 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'baz', 'User') }.not_to raise_error
       expect(client.get_metadata(scope: 'Group')).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Group')
         ]
       )
       expect(client.get_metadata(scope: 'User')).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'baz', scope: 'User')
         ]
       )
     end
@@ -184,15 +184,15 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('baz', 'qux', 'User') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
         ]
       )
 
       expect { client.destroy_metadata('User', 'baz') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User')
         ]
       )
     end
@@ -202,8 +202,8 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('baz', 'qux', 'User') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
-          Symgate::Metadata::DataItem.new(key: 'baz', 'value': 'qux', scope: 'User')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
         ]
       )
 
@@ -220,15 +220,15 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'baz', 'Group') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'User'),
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'baz', scope: 'Group')
         ]
       )
 
       expect { client.destroy_metadata('User', 'foo') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'baz', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'baz', scope: 'Group')
         ]
       )
     end
@@ -237,7 +237,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'bar', 'Group') }.not_to raise_error
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Group')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Group')
         ]
       )
 
@@ -262,7 +262,7 @@ RSpec.describe(Symgate::Metadata::Client) do
 
       expect(client.get_metadata).to match_array(
         [
-          Symgate::Metadata::DataItem.new(key: 'foo', 'value': 'bar', scope: 'Account')
+          Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account')
         ]
       )
 
