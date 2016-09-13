@@ -74,7 +74,7 @@ auth_client = Symgate::Auth::Client.new(account: 'my_account',
                                         password: 'secret')
 
 begin
-  token = auth.authenticate
+  token = auth_client.authenticate
 rescue Symgate::Error => e
   puts "Authentication failed with the following error: #{e.message}"
 end
