@@ -56,7 +56,7 @@ require 'symgate/wordlist'
 
 wordlist_client = Symgate::Wordlist::Client.new(account: 'my_account', 
                                                 user: 'group/user',
-                                                password: 'secret)
+                                                password: 'secret')
 ```
 
 #### User/token
@@ -71,7 +71,7 @@ require 'symgate/metadata'
 
 auth_client = Symgate::Auth::Client.new(account: 'my_account', 
                                         user: 'group/user',
-                                        password: 'secret)
+                                        password: 'secret')
 
 begin
   token = auth.authenticate
