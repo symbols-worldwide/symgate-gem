@@ -24,13 +24,13 @@ module Symgate
 
       def to_soap
         {
-          'wl:word': word,
-          'wl:uuid': uuid,
-          'wl:priority': priority,
-          'wl:conceptcode': value_or_nil(concept_code),
-          'cml:symbol': @symbols.tryit { map(&:to_soap) },
-          'wl:customgraphic': @custom_graphics.tryit { map(&:to_soap) },
-          'wl:lastchange': last_change.to_s
+          %s(wl:word) => word,
+          %s(wl:uuid) => uuid,
+          %s(wl:priority) => priority,
+          %s(wl:conceptcode) => value_or_nil(concept_code),
+          %s(cml:symbol) => @symbols.tryit { map(&:to_soap) },
+          %s(wl:customgraphic) => @custom_graphics.tryit { map(&:to_soap) },
+          %s(wl:lastchange) => last_change.to_s
         }.delete_if { |_, v| v.nil? }
       end
 

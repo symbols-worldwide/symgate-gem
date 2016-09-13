@@ -93,7 +93,7 @@ module Symgate
         end
 
         savon_request(:insert_wordlist_entry, returns_error_string: true) do |soap|
-          soap.message(wordlistid: uuid, 'wl:wordlistentry': entry.to_soap)
+          soap.message(wordlistid: uuid, %s(wl:wordlistentry) => entry.to_soap)
         end
       end
 
@@ -102,7 +102,7 @@ module Symgate
         check_array_for_type(entries, Symgate::Wordlist::Entry)
 
         savon_request(:overwrite_wordlist, returns_error_string: true) do |soap|
-          soap.message(wordlistid: uuid, 'wl:wordlistentry': entries.map(&:to_soap))
+          soap.message(wordlistid: uuid, %s(wl:wordlistentry) => entries.map(&:to_soap))
         end
       end
 
@@ -158,7 +158,7 @@ module Symgate
           context: context,
           scope: scope_for_context(context)
         }.merge(
-          entries ? { 'wl:wordlistentry': entries.map(&:to_soap) } : {}
+          entries ? { %s(wl:wordlistentry) => entries.map(&:to_soap) } : {}
         )
       end
     end

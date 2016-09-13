@@ -18,6 +18,10 @@ The API provides a client for each of the sections of API functionality. These a
 
 Please note that a symbolisation client is scheduled for a future release.
 
+## Prerequisites
+
+This gem works with Ruby 2.1 and above
+
 ## Installation
 
 Add this line to your application's Gemfile:

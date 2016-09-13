@@ -21,16 +21,16 @@ module Symgate
 
       def to_soap
         {
-          'cml:symset': symset,
-          'cml:main': main,
-          'cml:top_left': top_left,
-          'cml:top_right': top_right,
-          'cml:bottom_left': bottom_left,
-          'cml:bottom_right': bottom_right,
-          'cml:full_left': full_left,
-          'cml:full_right': full_right,
-          'cml:top': top,
-          'cml:extra': extra
+          %s(cml:symset) => symset,
+          %s(cml:main) => main,
+          %s(cml:top_left) => top_left,
+          %s(cml:top_right) => top_right,
+          %s(cml:bottom_left) => bottom_left,
+          %s(cml:bottom_right) => bottom_right,
+          %s(cml:full_left) => full_left,
+          %s(cml:full_right) => full_right,
+          %s(cml:top) => top,
+          %s(cml:extra) => extra
         }.delete_if { |_, v| v.nil? }
       end
 

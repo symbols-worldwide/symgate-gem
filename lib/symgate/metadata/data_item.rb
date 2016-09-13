@@ -14,9 +14,9 @@ module Symgate
 
       def to_soap
         {
-          '@key': key,
-          '@scope': scope,
-          'auth:value': value
+          %s(@key) => key,
+          %s(@scope) => scope,
+          %s(auth:value) => value
         }
       end
 

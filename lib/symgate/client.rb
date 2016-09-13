@@ -66,15 +66,15 @@ module Symgate
 
     # builds a credentials object - required for all requests
     def savon_creds
-      creds = { 'auth:account': @account }
+      creds = { %s(auth:account) => @account }
       creds[:'auth:key'] = @key if @key
       creds[:'auth:user'] = savon_user if @user
 
-      { 'auth:creds': creds }
+      { %s(auth:creds) => creds }
     end
 
     def savon_user
-      user = { 'auth:id': @user }
+      user = { %s(auth:id) => @user }
       user[:'auth:password'] = @password if @password
       user[:'auth:authtoken'] = @token if @token
 

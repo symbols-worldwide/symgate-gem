@@ -6,7 +6,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_groups' do
     it 'returns an empty array if there are no groups' do
       savon.expects(:enumerate_groups)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar') })
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -15,7 +15,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with one item if there is one group' do
       savon.expects(:enumerate_groups)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar') })
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -24,7 +24,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with two items if there are two groups' do
       savon.expects(:enumerate_groups)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar') })
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -35,7 +35,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#create_group' do
     it 'returns a valid response when creating a group' do
       savon.expects(:create_group)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/create_group.xml'))
 
@@ -47,7 +47,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#destroy_group' do
     it 'returns a valid response when destroying a group' do
       savon.expects(:destroy_group)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/destroy_group.xml'))
 
@@ -59,7 +59,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#rename_group' do
     it 'returns a valid response when destroying a group' do
       savon.expects(:rename_group)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             old_groupid: 'baz',
                             new_groupid: 'turlingdrome' })
            .returns(File.read('test/spec/fixtures/xml/rename_group.xml'))
@@ -72,7 +72,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_users' do
     it 'returns an empty array if there are no users' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_empty.xml'))
 
@@ -82,7 +82,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with a single user if there is one user' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_one.xml'))
 
@@ -93,7 +93,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with a two users if there are two users' do
       savon.expects(:enumerate_users)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_two.xml'))
 
@@ -109,9 +109,9 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#create_user' do
     it 'creates a user' do
       savon.expects(:create_user)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
-                            'auth:user': '',
-                            attributes!: { 'auth:user': { id: 'baz' } },
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
+                            %s(auth:user) => '',
+                            attributes!: { %s(auth:user) => { id: 'baz' } },
                             password: 'frob' })
            .returns(File.read('test/spec/fixtures/xml/create_user.xml'))
 
@@ -124,9 +124,9 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#update_user' do
     it 'updates a user' do
       savon.expects(:update_user)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
-                            'auth:user': '',
-                            attributes!: { 'auth:user': { id: 'baz', isGroupAdmin: true } } })
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
+                            %s(auth:user) => '',
+                            attributes!: { %s(auth:user) => { id: 'baz', isGroupAdmin: true } } })
            .returns(File.read('test/spec/fixtures/xml/update_user.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
@@ -138,7 +138,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#rename_user' do
     it 'renames a user' do
       savon.expects(:rename_user)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             old_user_id: 'group/baz',
                             new_user_id: 'group/frob' })
            .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
@@ -151,7 +151,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#move_user' do
     it 'moves a user' do
       savon.expects(:move_user)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             old_user_id: 'group/baz',
                             new_user_id: 'frob/baz' })
            .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
@@ -164,7 +164,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#set_user_password' do
     it 'sets the user\'s password' do
       savon.expects(:set_user_password)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             userid: 'group/baz',
                             password: 'frob' })
            .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
@@ -177,7 +177,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#destroy_user' do
     it 'destroys the user' do
       savon.expects(:destroy_user)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             userid: 'group/baz' })
            .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
 
@@ -189,7 +189,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#authenticate' do
     it 'authenticates and returns a token with normal auth' do
       savon.expects(:authenticate)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/baz', 'frob') })
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/baz', 'frob') })
            .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
@@ -200,7 +200,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'authenticates and returns a token with impersonation' do
       savon.expects(:authenticate)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             userid: 'group/baz' })
            .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
@@ -214,7 +214,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#add_group_language' do
     it 'successfully adds a new group language' do
       savon.expects(:add_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/add_group_language.xml'))
@@ -227,7 +227,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns Exists if a language already exists' do
       savon.expects(:add_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/add_group_language_exists.xml'))
@@ -242,7 +242,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#remove_group_language' do
     it 'successfully removes the language from the group' do
       savon.expects(:remove_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/remove_group_language.xml'))
@@ -255,7 +255,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns NotExist if a language is not present' do
       savon.expects(:remove_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/remove_group_language_not_exist.xml'))
@@ -270,7 +270,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_group_languages' do
     it 'returns an empty array when there are no languages' do
       savon.expects(:enumerate_group_languages)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_empty.xml'))
 
@@ -280,7 +280,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an empty array when there are no languages' do
       savon.expects(:enumerate_group_languages)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_one.xml'))
 
@@ -290,7 +290,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array containing two items when there are two languages' do
       savon.expects(:enumerate_group_languages)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_two.xml'))
 
@@ -302,7 +302,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#query_group_language' do
     it 'returns true if the language is present' do
       savon.expects(:query_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/query_group_language_true.xml'))
@@ -313,7 +313,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns false if the language is not present' do
       savon.expects(:query_group_language)
-           .with(message: { 'auth:creds': account_key_creds('foo', 'bar'),
+           .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar'),
                             groupid: 'baz',
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/query_group_language_false.xml'))
@@ -326,7 +326,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#enumerate_languages' do
     it 'returns an empty array when there are no languages' do
       savon.expects(:enumerate_languages)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/bar', 'baz') })
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_empty.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
@@ -335,7 +335,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an empty array when there are no languages' do
       savon.expects(:enumerate_languages)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/bar', 'baz') })
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
@@ -344,7 +344,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array containing two items when there are two languages' do
       savon.expects(:enumerate_languages)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/bar', 'baz') })
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
@@ -355,7 +355,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe '#query_language' do
     it 'returns true if the language is present' do
       savon.expects(:query_language)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/bar', 'baz'),
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz'),
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/query_language_true.xml'))
 
@@ -365,7 +365,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns false if the language is not present' do
       savon.expects(:query_language)
-           .with(message: { 'auth:creds': user_password_creds('foo', 'group/bar', 'baz'),
+           .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz'),
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/query_language_false.xml'))
 

@@ -36,13 +36,13 @@ RSpec.configure do |config|
 end
 
 def account_key_creds(account, key)
-  { 'auth:account': account, 'auth:key': key }
+  { %s(auth:account) => account, %s(auth:key) => key }
 end
 
 def user_password_creds(account, user, password)
-  { 'auth:account': account,
-    'auth:user': { 'auth:id': user,
-                   'auth:password': password } }
+  { %s(auth:account) => account,
+    %s(auth:user) => { %s(auth:id) => user,
+                       %s(auth:password) => password } }
 end
 
 def get_kitten(variation = :default)

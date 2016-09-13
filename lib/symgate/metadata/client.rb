@@ -43,7 +43,7 @@ module Symgate
         raise Symgate::Error, 'No items supplied' if i.empty?
 
         savon_request(:set_metadata, returns_error_string: true) do |soap|
-          soap.message('auth:data_item': i.map(&:to_soap))
+          soap.message(%s(auth:data_item) => i.map(&:to_soap))
         end
       end
 
