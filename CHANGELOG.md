@@ -1,3 +1,7 @@
+## 0.2.1 (2016-09-13)
+
+Updated hash syntax to be compatible with Ruby 2.1 in tests
+
 ## 0.2.0 (2016-09-13)
 
 Updated hash syntax to be compatible with Ruby 2.1
