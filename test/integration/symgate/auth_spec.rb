@@ -59,6 +59,12 @@ RSpec.describe(Symgate::Auth::Client) do
       expect { client.create_group('foo') }.not_to raise_error
       expect { client.create_group('foo') }.to raise_error(Symgate::Error)
     end
+
+    it 'allows the creation of groups with accents in their names' do
+      client = account_key_client
+
+      expect { client.create_group('föö') }.not_to raise_error
+    end
   end
 
   describe '#destroy_group' do
@@ -75,6 +81,15 @@ RSpec.describe(Symgate::Auth::Client) do
       client = account_key_client
 
       expect { client.destroy_group('foo') }.to raise_error(Symgate::Error)
+    end
+
+    it 'allows the removal of groups with accents in their names' do
+      client = account_key_client
+
+      expect { client.create_group('föö') }.not_to raise_error
+      expect(client.enumerate_groups).to match_array(['föö'])
+      expect { client.destroy_group('föö') }.not_to raise_error
+      expect(client.enumerate_groups).to match_array([])
     end
   end
 
@@ -182,6 +197,15 @@ RSpec.describe(Symgate::Auth::Client) do
       expect { client.create_group('foo') }.not_to raise_error
       expect { client.create_user(user, 'asdf1234') }.not_to raise_error
       expect(client.enumerate_users('foo')).to eq([user])
+    end
+
+    it 'allows the creation of users with accents in their names' do
+      client = account_key_client
+      user = Symgate::Auth::User.new(user_id: 'föö/böö')
+
+      expect { client.create_group('föö') }.not_to raise_error
+      expect { client.create_user(user, 'asdf1234') }.not_to raise_error
+      expect(client.enumerate_users('föö')).to eq([user])
     end
 
     it 'should raise an error when called with user credentials' do
