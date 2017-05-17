@@ -2,6 +2,7 @@ require 'base64'
 require 'symgate/client'
 require 'symgate/error'
 require 'symgate/wordlist/info'
+require 'symgate/wordlist/entry'
 
 module Symgate
   module Wordlist
