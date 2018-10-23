@@ -23,7 +23,7 @@ module Symgate
       protected
 
       def attributes
-        %i(name context uuid entry_count last_change engine scope)
+        %i[name context uuid entry_count last_change engine scope]
       end
     end
   end

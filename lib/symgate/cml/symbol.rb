@@ -41,7 +41,7 @@ module Symgate
       protected
 
       def attributes
-        %i(symset main top_left top_right bottom_left bottom_right full_left full_right top extra)
+        %i[symset main top_left top_right bottom_left bottom_right full_left full_right top extra]
       end
     end
   end

@@ -2,7 +2,7 @@ require 'symgate/client'
 require 'symgate/error'
 require 'symgate/metadata/data_item'
 
-# rubocop:disable Style/AccessorMethodName
+# rubocop:disable Naming/AccessorMethodName
 
 module Symgate
   module Metadata
@@ -65,8 +65,10 @@ module Symgate
       def parse_get_metadata_opts(opts)
         arrayize_option(:key, :keys, opts)
         check_option_is_array_of(String, :keys, opts)
-        check_for_unknown_opts(%i(keys scope), opts)
+        check_for_unknown_opts(%i[keys scope], opts)
       end
     end
   end
 end
+
+# rubocop:enable Naming/AccessorMethodName

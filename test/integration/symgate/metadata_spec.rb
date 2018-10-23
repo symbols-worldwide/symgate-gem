@@ -76,7 +76,7 @@ RSpec.describe(Symgate::Metadata::Client) do
       expect { create_data_item('foo', 'bar', 'User') }.not_to raise_error
       expect { create_data_item('baz', 'qux', 'Group') }.not_to raise_error
       expect { create_data_item('garply', 'thud', 'Group') }.not_to raise_error
-      expect(client.get_metadata(keys: %w(foo baz))).to match_array(
+      expect(client.get_metadata(keys: %w[foo baz])).to match_array(
         [
           Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'User'),
           Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'Group')
@@ -207,7 +207,7 @@ RSpec.describe(Symgate::Metadata::Client) do
         ]
       )
 
-      expect { client.destroy_metadata('User', %w(foo baz)) }.not_to raise_error
+      expect { client.destroy_metadata('User', %w[foo baz]) }.not_to raise_error
       expect(client.get_metadata).to match_array([])
     end
 

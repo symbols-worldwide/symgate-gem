@@ -30,7 +30,7 @@ module Symgate
       protected
 
       def attributes
-        %i(user_id is_group_admin)
+        %i[user_id is_group_admin]
       end
     end
   end

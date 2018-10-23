@@ -3,6 +3,16 @@ require_relative '../../spec_helper.rb'
 require 'symgate/auth/client'
 
 RSpec.describe(Symgate::Auth::Client) do
+  describe 'request validation' do
+    # Detect duplicate xmlns:symboliser attributes in <Envelope> element. See issue #3.
+    it 'sends valid XML in the SOAP request' do
+      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
+      request = client.savon_client.build_request(:authenticate)
+      doc = Nokogiri::XML(request.body)
+      expect(doc.errors).to be_empty
+    end
+  end
+
   describe '#enumerate_groups' do
     it 'returns an empty array if there are no groups' do
       savon.expects(:enumerate_groups)
@@ -19,7 +29,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_groups).to match_array(%w(one))
+      expect(client.enumerate_groups).to match_array(%w[one])
     end
 
     it 'returns an array with two items if there are two groups' do
@@ -28,7 +38,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_groups).to match_array(%w(one two))
+      expect(client.enumerate_groups).to match_array(%w[one two])
     end
   end
 
@@ -295,7 +305,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_group_languages('baz')).to match_array(%w(English_UK Swedish))
+      expect(client.enumerate_group_languages('baz')).to match_array(%w[English_UK Swedish])
     end
   end
 
@@ -348,7 +358,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
-      expect(client.enumerate_languages).to match_array(%w(English_UK Swedish))
+      expect(client.enumerate_languages).to match_array(%w[English_UK Swedish])
     end
   end
 

@@ -3,6 +3,8 @@ require_relative '../../spec_helper.rb'
 require 'symgate/wordlist/entry'
 require 'symgate/cml/symbol'
 
+# rubocop:disable Style/DateTime
+
 RSpec.describe(Symgate::Wordlist::Entry) do
   it 'allows direct access to the wordlist entry attributes' do
     e = Symgate::Wordlist::Entry.new
@@ -136,3 +138,5 @@ RSpec.describe(Symgate::Wordlist::Entry) do
     expect(e.to_s).to include('f7a23690-534a-0134-9ec1-20cf302b46f2')
   end
 end
+
+# rubocop:enable Style/DateTime

@@ -1,5 +1,4 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'symgate'
 
@@ -19,16 +18,16 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.9'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'rspec', '~> 3.4.0'
-  spec.add_development_dependency 'rubocop', '~> 0.41.1'
-  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
-  spec.add_development_dependency 'rubocop-junit-formatter', '~> 0.1.3'
-  spec.add_development_dependency 'rack', '~> 1.6.4'
+  spec.add_development_dependency 'codecov'
   spec.add_development_dependency 'mysql2', '~> 0.4.1'
+  spec.add_development_dependency 'rack', '~> 1.6.4'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rspec', '~> 3.8.0'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.2.3'
+  spec.add_development_dependency 'rubocop', '~> 0.57.0'
+  spec.add_development_dependency 'rubocop-junit-formatter', '~> 0.1.3'
   spec.add_development_dependency 'simplecov', '~> 0.12.0'
   spec.add_development_dependency 'simplecov-teamcity-summary', '~> 0.1.2'
-  spec.add_development_dependency 'codecov'
 
   spec.add_dependency 'savon', '~> 2.11.0'
   spec.add_dependency 'tryit', '~> 0.0.1'

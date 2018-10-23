@@ -128,11 +128,11 @@ RSpec.describe(Symgate::Client) do
     end
 
     it 'returns an array with one item when the hash item is a non-array' do
-      expect(Symgate::Client.savon_array({ foo: 'bar' }, :foo)).to match_array(%w(bar))
+      expect(Symgate::Client.savon_array({ foo: 'bar' }, :foo)).to match_array(%w[bar])
     end
 
     it 'returns an array with multiple items when the hash item is an array' do
-      expect(Symgate::Client.savon_array({ foo: %w(bar baz) }, :foo)).to match_array(%w(bar baz))
+      expect(Symgate::Client.savon_array({ foo: %w[bar baz] }, :foo)).to match_array(%w[bar baz])
     end
   end
 end

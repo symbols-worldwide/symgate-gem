@@ -24,7 +24,7 @@ module Symgate
 
     def self.message_from_savon_error(error)
       "#{error.message}. #{error.to_hash[:fault][:detail]}"
-    rescue
+    rescue StandardError
       # :nocov:
       error.message
       # :nocov:

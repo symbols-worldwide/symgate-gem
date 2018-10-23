@@ -4,6 +4,8 @@ require 'symgate/auth/client'
 require 'symgate/wordlist/client'
 require 'symgate/wordlist/entry'
 
+# rubocop:disable Style/DateTime
+
 RSpec.describe(Symgate::Wordlist::Client) do
   def client
     user_password_client_of_type(Symgate::Wordlist::Client, 'foo/bar', 'baz')
@@ -156,7 +158,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect { client.create_wordlist('baz', 'SymbolSet') }.not_to raise_error
 
       resp = nil
-      expect { resp = client.enumerate_wordlists(%w(SymbolSet User)) }.not_to raise_error
+      expect { resp = client.enumerate_wordlists(%w[SymbolSet User]) }.not_to raise_error
 
       expect(resp).to be_a(Array)
       expect(resp.count).to eq(2)
@@ -172,7 +174,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
 
     it 'raises an error when passed an invalid context in an array' do
-      expect { client.enumerate_wordlists(%w(User Topic Teapot SymbolSet)) }
+      expect { client.enumerate_wordlists(%w[User Topic Teapot SymbolSet]) }
         .to raise_error(Symgate::Error)
     end
   end
@@ -646,28 +648,28 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(reset_wordlist_entry_times(
                client.get_wordlist_entries(uuid),
                dt
-      )).to match_array(
-        [
-          Symgate::Wordlist::Entry.new(
-            word: 'cat',
-            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'foo.svg')
-            ],
-            last_change: dt
-          ),
-          Symgate::Wordlist::Entry.new(
-            word: 'bar',
-            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'bar.svg')
-            ],
-            last_change: dt
-          )
-        ]
-      )
+             )).to match_array(
+               [
+                 Symgate::Wordlist::Entry.new(
+                   word: 'cat',
+                   uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'foo.svg')
+                   ],
+                   last_change: dt
+                 ),
+                 Symgate::Wordlist::Entry.new(
+                   word: 'bar',
+                   uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'bar.svg')
+                   ],
+                   last_change: dt
+                 )
+               ]
+             )
     end
 
     it 'accepts an option to include attachments' do
@@ -710,35 +712,35 @@ RSpec.describe(Symgate::Wordlist::Client) do
                client.get_wordlist_entries(uuid,
                                            attachments: true),
                dt
-      )).to match_array(
-        [
-          Symgate::Wordlist::Entry.new(
-            word: 'cat',
-            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'foo.svg')
-            ],
-            custom_graphics: [
-              Symgate::Wordlist::GraphicAttachment.new(
-                type: 'image/jpeg',
-                uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
-                data: get_kitten
-              )
-            ],
-            last_change: dt
-          ),
-          Symgate::Wordlist::Entry.new(
-            word: 'bar',
-            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'bar.svg')
-            ],
-            last_change: dt
-          )
-        ]
-      )
+             )).to match_array(
+               [
+                 Symgate::Wordlist::Entry.new(
+                   word: 'cat',
+                   uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'foo.svg')
+                   ],
+                   custom_graphics: [
+                     Symgate::Wordlist::GraphicAttachment.new(
+                       type: 'image/jpeg',
+                       uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
+                       data: get_kitten
+                     )
+                   ],
+                   last_change: dt
+                 ),
+                 Symgate::Wordlist::Entry.new(
+                   word: 'bar',
+                   uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'bar.svg')
+                   ],
+                   last_change: dt
+                 )
+               ]
+             )
     end
 
     it 'accepts an option to filter by word' do
@@ -789,28 +791,28 @@ RSpec.describe(Symgate::Wordlist::Client) do
                client.get_wordlist_entries(uuid,
                                            match: 'dog'),
                dt
-      )).to match_array(
-        [
-          Symgate::Wordlist::Entry.new(
-            word: 'dog',
-            uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'bar.svg')
-            ],
-            last_change: dt
-          ),
-          Symgate::Wordlist::Entry.new(
-            word: 'dog',
-            uuid: '{abbbf3b7-0437-4899-adea-d9f911216674}',
-            priority: 1,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'baz.svg')
-            ],
-            last_change: dt
-          )
-        ]
-      )
+             )).to match_array(
+               [
+                 Symgate::Wordlist::Entry.new(
+                   word: 'dog',
+                   uuid: '{6518be5d-b989-4adf-b076-e787ed53cb88}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'bar.svg')
+                   ],
+                   last_change: dt
+                 ),
+                 Symgate::Wordlist::Entry.new(
+                   word: 'dog',
+                   uuid: '{abbbf3b7-0437-4899-adea-d9f911216674}',
+                   priority: 1,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'baz.svg')
+                   ],
+                   last_change: dt
+                 )
+               ]
+             )
     end
 
     it 'accepts an option to filter by conceptcode' do
@@ -853,19 +855,19 @@ RSpec.describe(Symgate::Wordlist::Client) do
                client.get_wordlist_entries(uuid,
                                            entry: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}'),
                dt
-      )).to match_array(
-        [
-          Symgate::Wordlist::Entry.new(
-            word: 'cat',
-            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'foo.svg')
-            ],
-            last_change: dt
-          )
-        ]
-      )
+             )).to match_array(
+               [
+                 Symgate::Wordlist::Entry.new(
+                   word: 'cat',
+                   uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'foo.svg')
+                   ],
+                   last_change: dt
+                 )
+               ]
+             )
     end
 
     it 'accepts options to filter and to return attachments at the same time' do
@@ -909,26 +911,26 @@ RSpec.describe(Symgate::Wordlist::Client) do
                                            entry: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
                                            attachments: true),
                dt
-      )).to match_array(
-        [
-          Symgate::Wordlist::Entry.new(
-            word: 'cat',
-            uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
-            priority: 0,
-            symbols: [
-              Symgate::Cml::Symbol.new(main: 'foo.svg')
-            ],
-            custom_graphics: [
-              Symgate::Wordlist::GraphicAttachment.new(
-                type: 'image/jpeg',
-                uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
-                data: get_kitten
-              )
-            ],
-            last_change: dt
-          )
-        ]
-      )
+             )).to match_array(
+               [
+                 Symgate::Wordlist::Entry.new(
+                   word: 'cat',
+                   uuid: '{c0fb70eb-0833-4572-86ef-cdb8edf8a6c1}',
+                   priority: 0,
+                   symbols: [
+                     Symgate::Cml::Symbol.new(main: 'foo.svg')
+                   ],
+                   custom_graphics: [
+                     Symgate::Wordlist::GraphicAttachment.new(
+                       type: 'image/jpeg',
+                       uuid: '{b563f100-08c2-428d-afdb-302f0f7608d9}',
+                       data: get_kitten
+                     )
+                   ],
+                   last_change: dt
+                 )
+               ]
+             )
     end
   end
 
@@ -1019,3 +1021,5 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
   end
 end
+
+# rubocop:enable Style/DateTime

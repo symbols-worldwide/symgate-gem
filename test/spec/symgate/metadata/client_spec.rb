@@ -67,11 +67,11 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts an array of keys as an input' do
       savon.expects(:get_metadata)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                            key: %w(foo baz) })
+                            key: %w[foo baz] })
            .returns(File.read('test/spec/fixtures/xml/get_metadata_two.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.get_metadata(keys: %w(foo baz))).to match_array(
+      expect(client.get_metadata(keys: %w[foo baz])).to match_array(
         [
           Symgate::Metadata::DataItem.new(key: 'foo', value: 'bar', scope: 'Account'),
           Symgate::Metadata::DataItem.new(key: 'baz', value: 'qux', scope: 'User')
@@ -82,7 +82,7 @@ RSpec.describe(Symgate::Auth::Client) do
     it 'accepts a single key as an input' do
       savon.expects(:get_metadata)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                            key: %w(foo) })
+                            key: %w[foo] })
            .returns(File.read('test/spec/fixtures/xml/get_metadata_one.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -110,7 +110,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'raises an error if both "key" and "keys" are supplied' do
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect { client.get_metadata(key: 'foo', keys: %w(bar baz)) }.to raise_error(Symgate::Error)
+      expect { client.get_metadata(key: 'foo', keys: %w[bar baz]) }.to raise_error(Symgate::Error)
     end
 
     it 'raises an error if an unknown option is supplied' do
@@ -204,11 +204,11 @@ RSpec.describe(Symgate::Auth::Client) do
       savon.expects(:destroy_metadata)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
                             scope: 'User',
-                            key: %w(foo bar) })
+                            key: %w[foo bar] })
            .returns(File.read('test/spec/fixtures/xml/destroy_metadata.xml'))
 
       client = Symgate::Metadata::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect { client.destroy_metadata('User', %w(foo bar)) }.not_to raise_error
+      expect { client.destroy_metadata('User', %w[foo bar]) }.not_to raise_error
     end
   end
 end
