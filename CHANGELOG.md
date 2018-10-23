@@ -1,3 +1,7 @@
+## 0.2.3 (2018-10-23)
+
+Fix for invalid SOAP XML due to duplicate attributes (issue #3) 
+
 ## 0.2.2 (2017-05-17)
 
 Require wordlist entry class in wordlist client so that get_wordlist_entries method works without
