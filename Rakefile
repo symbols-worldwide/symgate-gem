@@ -24,7 +24,7 @@ begin
     spec.pattern = 'test/integration/**/*_spec.rb'
   end
 rescue LoadError
-  $stderr.puts 'Unable to find rspec gem'
+  $stderr.warn 'Unable to find rspec gem'
 end
 
 desc 'Runs the rubocop linting tool'
@@ -33,7 +33,7 @@ task :rubocop do
 end
 
 desc 'Run all tests'
-task test: [:rubocop, :spec]
+task test: %i[rubocop spec]
 
 namespace :teamcity do
   desc 'Runs rubocop with junit output'
@@ -55,10 +55,10 @@ namespace :teamcity do
   task :test do
     first_exception = nil
 
-    %w(teamcity:rubocop
+    %w[teamcity:rubocop
        teamcity:spec
        teamcity:zip_coverage
-       teamcity:spec:integration).each do |task_name|
+       teamcity:spec:integration].each do |task_name|
       begin
         Rake::Task[task_name].invoke
       rescue Exception => e
@@ -98,3 +98,5 @@ namespace :vagrant do
            chdir: 'symboliser-vagrant'
   end
 end
+
+# rubocop:enable Lint/RescueException

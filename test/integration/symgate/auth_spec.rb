@@ -36,7 +36,7 @@ RSpec.describe(Symgate::Auth::Client) do
       expect { client.create_group('bar') }.not_to raise_error
       expect { client.create_group('baz') }.not_to raise_error
 
-      expect(client.enumerate_groups).to match_array(%w(foo bar baz))
+      expect(client.enumerate_groups).to match_array(%w[foo bar baz])
     end
   end
 
@@ -552,7 +552,7 @@ RSpec.describe(Symgate::Auth::Client) do
 
     it 'returns an array with multiple languages when there are multiple languages' do
       client = account_key_client
-      languages = %w(English_UK Swedish Danish)
+      languages = %w[English_UK Swedish Danish]
 
       expect { client.create_group('foo') }.not_to raise_error
       languages.each { |l| expect { client.add_group_language('foo', l) }.not_to raise_error }
@@ -681,7 +681,7 @@ RSpec.describe(Symgate::Auth::Client) do
     end
 
     it 'returns an array with multiple items when there are multiple languages assigned' do
-      languages = %w(English_UK Danish Swedish)
+      languages = %w[English_UK Danish Swedish]
 
       admin_client = account_key_client
       languages.each { |l| expect { admin_client.add_group_language('foo', l) }.not_to raise_error }

@@ -3,7 +3,7 @@ require 'mysql2'
 require 'savon'
 require 'symgate/wordlist/entry'
 
-# rubocop:disable Style/AccessorMethodName
+# rubocop:disable Naming/AccessorMethodName
 
 def integration_mysql_client
   Mysql2::Client.new(host: '127.0.0.1',
@@ -75,3 +75,5 @@ def reset_wordlist_entry_times(array, datetime)
     entry
   end
 end
+
+# rubocop:enable Naming/AccessorMethodName

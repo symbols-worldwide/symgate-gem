@@ -41,7 +41,7 @@ module Symgate
       protected
 
       def attributes
-        %i(word uuid priority concept_code symbols custom_graphics last_change)
+        %i[word uuid priority concept_code symbols custom_graphics last_change]
       end
     end
   end

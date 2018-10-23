@@ -30,7 +30,7 @@ module Symgate
       protected
 
       def attributes
-        %i(type uuid data)
+        %i[type uuid data]
       end
     end
   end

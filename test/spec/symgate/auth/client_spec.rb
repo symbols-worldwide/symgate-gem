@@ -19,7 +19,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_one.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_groups).to match_array(%w(one))
+      expect(client.enumerate_groups).to match_array(%w[one])
     end
 
     it 'returns an array with two items if there are two groups' do
@@ -28,7 +28,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_groups).to match_array(%w(one two))
+      expect(client.enumerate_groups).to match_array(%w[one two])
     end
   end
 
@@ -295,7 +295,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
-      expect(client.enumerate_group_languages('baz')).to match_array(%w(English_UK Swedish))
+      expect(client.enumerate_group_languages('baz')).to match_array(%w[English_UK Swedish])
     end
   end
 
@@ -348,7 +348,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_two.xml'))
 
       client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
-      expect(client.enumerate_languages).to match_array(%w(English_UK Swedish))
+      expect(client.enumerate_languages).to match_array(%w[English_UK Swedish])
     end
   end
 

@@ -27,7 +27,7 @@ module Symgate
       protected
 
       def attributes
-        %i(key value scope)
+        %i[key value scope]
       end
     end
   end

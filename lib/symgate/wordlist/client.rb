@@ -12,7 +12,7 @@ module Symgate
       # optionally, supply one or more wordlist contexts as a string or string array parameter
       # to only retrieve wordlist information about that context. e.g.:
       # enumerate_wordlists('User')
-      # enumerate_wordlists(%w(Topic SymbolSet))
+      # enumerate_wordlists(%w[Topic SymbolSet])
       def enumerate_wordlists(context = [])
         response = savon_request(:enumerate_wordlists) do |soap|
           soap.message(context: [context].flatten)
@@ -73,8 +73,8 @@ module Symgate
       #   match (string) - only return wordlist entries matching this word
       #   entry (string, uuid) - return the entry specified by the uuid
       def get_wordlist_entries(uuid, opts = {})
-        check_for_unknown_opts(%i(match entry attachments), opts)
-        check_for_multiple_opts(%i(match entry), opts)
+        check_for_unknown_opts(%i[match entry attachments], opts)
+        check_for_multiple_opts(%i[match entry], opts)
 
         response = savon_request(:get_wordlist_entries) do |soap|
           soap.message(wordlistid: uuid, getattachments: opts[:attachments])

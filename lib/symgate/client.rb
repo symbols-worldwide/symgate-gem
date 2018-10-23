@@ -52,9 +52,8 @@ module Symgate
     end
 
     def validate_is_passwordy
-      unless [@key, @password, @token].one?
-        raise Symgate::Error, 'You must supply one of key, password or token'
-      end
+      raise Symgate::Error, 'You must supply one of key, password or token' unless
+          [@key, @password, @token].one?
     end
 
     def create_savon_client
@@ -102,21 +101,18 @@ module Symgate
     end
 
     def arrayize_option(singular, plural, opts)
-      if opts.include? singular # else nothing to do
-        if opts.include? plural
-          raise Symgate::Error, "Options can't include both #{singular} and #{plural}"
-        end
+      return unless opts.include? singular # else nothing to do
+      raise Symgate::Error, "Options can't include both #{singular} and #{plural}" if
+          opts.include? plural
 
-        opts[plural] = [opts[singular]]
-        opts.delete(singular)
-      end
+      opts[plural] = [opts[singular]]
+      opts.delete(singular)
     end
 
     def check_option_is_array_of(classname, key, opts)
-      if opts.include? key
-        raise Symgate::Error, "#{key} must be an array" unless opts[key].is_a? Array
-        check_array_for_type(opts[key], classname)
-      end
+      return unless opts.include? key
+      raise Symgate::Error, "#{key} must be an array" unless opts[key].is_a? Array
+      check_array_for_type(opts[key], classname)
     end
 
     def check_for_unknown_opts(keys, opts)

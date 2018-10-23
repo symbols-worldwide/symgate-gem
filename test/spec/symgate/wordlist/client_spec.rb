@@ -3,6 +3,8 @@ require_relative '../../spec_helper.rb'
 require 'symgate/wordlist/client'
 require 'base64'
 
+# rubocop:disable Style/DateTime
+
 RSpec.describe(Symgate::Wordlist::Client) do
   describe '#enumerate_wordlists' do
     it 'returns an empty array if there are no wordlists' do
@@ -62,7 +64,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     it 'accepts a filter of a single context' do
       savon.expects(:enumerate_wordlists)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                            context: %w(User) })
+                            context: %w[User] })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_one.xml'))
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -82,11 +84,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
     it 'accepts a filter of an array of contexts' do
       savon.expects(:enumerate_wordlists)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                            context: %w(User Lexical) })
+                            context: %w[User Lexical] })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_one.xml'))
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      expect(client.enumerate_wordlists(%w(User Lexical))).to match_array(
+      expect(client.enumerate_wordlists(%w[User Lexical])).to match_array(
         [
           Symgate::Wordlist::Info.new(name: 'foo',
                                       uuid: '1c257ded-4e07-4fcf-be72-2126f368cecd',
@@ -102,7 +104,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     it 'raises an error when passed an invalid context' do
       savon.expects(:enumerate_wordlists)
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                            context: %w(Teapot) })
+                            context: %w[Teapot] })
            .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
@@ -747,3 +749,5 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
   end
 end
+
+# rubocop:enable Style/DateTime
