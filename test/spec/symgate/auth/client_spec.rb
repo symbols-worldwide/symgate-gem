@@ -3,6 +3,16 @@ require_relative '../../spec_helper.rb'
 require 'symgate/auth/client'
 
 RSpec.describe(Symgate::Auth::Client) do
+  describe 'request validation' do
+    # Detect duplicate xmlns:symboliser attributes in <Envelope> element. See issue #3.
+    it 'sends valid XML in the SOAP request' do
+      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
+      request = client.savon_client.build_request(:authenticate)
+      doc = Nokogiri::XML(request.body)
+      expect(doc.errors).to be_empty
+    end
+  end
+
   describe '#enumerate_groups' do
     it 'returns an empty array if there are no groups' do
       savon.expects(:enumerate_groups)
