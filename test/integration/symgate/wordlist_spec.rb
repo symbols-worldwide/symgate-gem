@@ -7,6 +7,8 @@ require 'symgate/wordlist/entry'
 # rubocop:disable Style/DateTime
 
 RSpec.describe(Symgate::Wordlist::Client) do
+  non_lexical_contexts = %w[Topic SymbolSet User Attached Document]
+
   def client
     user_password_client_of_type(Symgate::Wordlist::Client, 'foo/bar', 'baz')
   end
@@ -98,6 +100,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ]
@@ -113,7 +116,8 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
   describe '#enumerate_wordlists' do
     it 'returns an empty array when there are no wordlists' do
-      expect(client.enumerate_wordlists).to match_array([])
+      # Ignore lexical wordlists
+      expect(client.enumerate_wordlists(non_lexical_contexts)).to match_array([])
     end
 
     it 'returns a list of all wordlists when there are several' do
@@ -122,7 +126,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect { client.create_wordlist('baz', 'SymbolSet') }.not_to raise_error
 
       resp = nil
-      expect { resp = client.enumerate_wordlists }.not_to raise_error
+      expect { resp = client.enumerate_wordlists(non_lexical_contexts) }.not_to raise_error
 
       expect(resp).to be_a(Array)
       expect(resp.count).to eq(3)
@@ -187,22 +191,22 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'deletes a user wordlist' do
       resp = nil
-      expect(client.enumerate_wordlists.count).to eq(0)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(0)
       expect { resp = client.create_wordlist('foo', 'User') }.not_to raise_error
-      expect(client.enumerate_wordlists.count).to eq(1)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(1)
 
       expect { client.destroy_wordlist(resp.uuid) }.not_to raise_error
-      expect(client.enumerate_wordlists.count).to eq(0)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(0)
     end
 
     it 'deletes a topic wordlist' do
       resp = nil
-      expect(client.enumerate_wordlists.count).to eq(0)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(0)
       expect { resp = client.create_wordlist('foo', 'Topic') }.not_to raise_error
-      expect(client.enumerate_wordlists.count).to eq(1)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(1)
 
       expect { client.destroy_wordlist(resp.uuid) }.not_to raise_error
-      expect(client.enumerate_wordlists.count).to eq(0)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(0)
     end
   end
 
@@ -214,9 +218,9 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'gets information about a wordlist' do
       resp = nil
-      expect(client.enumerate_wordlists.count).to eq(0)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(0)
       expect { resp = client.create_wordlist('foo', 'User') }.not_to raise_error
-      expect(client.enumerate_wordlists.count).to eq(1)
+      expect(client.enumerate_wordlists(non_lexical_contexts).count).to eq(1)
 
       expect { client.get_wordlist_info(resp.uuid) }.not_to raise_error
       expect(client.get_wordlist_info(resp.uuid)).to eq(resp)
@@ -257,7 +261,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
       expect { client.rename_wordlist(resp.uuid, 'bar') }.not_to raise_error
 
-      expect { resp = client.enumerate_wordlists }.not_to raise_error
+      expect { resp = client.enumerate_wordlists(non_lexical_contexts) }.not_to raise_error
       expect(resp[0].name).to eq(resp[1].name)
       expect(resp[0].uuid).not_to eq(resp[1].uuid)
     end
@@ -281,6 +285,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ]
@@ -307,6 +312,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ]
@@ -315,6 +321,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -333,6 +340,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'baz',
               uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'baz.svg')
               ]
@@ -341,6 +349,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'qux',
               uuid: '7596d217-1728-4707-a594-f92ab736eee7',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'qux.svg')
               ]
@@ -349,6 +358,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'quux',
               uuid: '656c8dcb-3aa3-44a3-96d6-e7d11e3f37a4',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'quux.svg')
               ]
@@ -381,6 +391,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
             word: 'baz',
             uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
             priority: 0,
+            last_change: DateTime.now,
             symbols: [
               Symgate::Cml::Symbol.new(main: 'baz.svg')
             ]
@@ -401,6 +412,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
             word: 'baz',
             uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
             priority: 0,
+            last_change: DateTime.now,
             symbols: [
               Symgate::Cml::Symbol.new(main: 'baz.svg')
             ]
@@ -438,6 +450,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
             word: 'baz',
             uuid: '8779812d-2293-454f-b299-47e8dee4fa8f',
             priority: 0,
+            last_change: DateTime.now,
             symbols: [
               Symgate::Cml::Symbol.new(main: 'baz.svg')
             ],
@@ -483,7 +496,8 @@ RSpec.describe(Symgate::Wordlist::Client) do
           uuid,
           Symgate::Wordlist::Entry.new(
             word: 'baz',
-            priority: 0
+            priority: 0,
+            last_change: DateTime.now
           )
         )
       end.not_to raise_error
@@ -530,6 +544,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ]
@@ -567,6 +582,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ]
@@ -575,6 +591,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -620,6 +637,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ],
@@ -635,6 +653,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -683,6 +702,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ],
@@ -698,6 +718,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -754,6 +775,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ],
@@ -769,6 +791,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'dog',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -777,6 +800,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'dog',
               uuid: 'abbbf3b7-0437-4899-adea-d9f911216674',
               priority: 1,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'baz.svg')
               ]
@@ -826,6 +850,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ],
@@ -841,6 +866,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
@@ -881,6 +907,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'cat',
               uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'foo.svg')
               ],
@@ -896,6 +923,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
               word: 'bar',
               uuid: '6518be5d-b989-4adf-b076-e787ed53cb88',
               priority: 0,
+              last_change: DateTime.now,
               symbols: [
                 Symgate::Cml::Symbol.new(main: 'bar.svg')
               ]
