@@ -1,3 +1,8 @@
+## 0.2.4 (2018-10-25)
+
+Make attachments option in get_wordlist_entries truly optional and update integration tests to
+work correctly with the latest symboliser
+
 ## 0.2.3 (2018-10-23)
 
 Fix for invalid SOAP XML due to duplicate attributes (issue #3) 
