@@ -77,7 +77,7 @@ module Symgate
         check_for_multiple_opts(%i[match entry], opts)
 
         response = savon_request(:get_wordlist_entries) do |soap|
-          soap.message(wordlistid: uuid, getattachments: opts[:attachments])
+          soap.message(wordlistid: uuid, getattachments: !!opts[:attachments])
           soap[:message][:match] = { matchstring: opts[:match] } if opts.include? :match
           soap[:message][:match] = { entryid: opts[:entry] } if opts.include? :entry
         end
