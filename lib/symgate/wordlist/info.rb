@@ -11,6 +11,7 @@ module Symgate
           uuid: hash_value_with_optional_namespace(:wl, :uuid, hash),
           engine: hash_value_with_optional_namespace(:wl, :engine, hash),
           scope: hash_value_with_optional_namespace(:wl, :scope, hash),
+          readonly: hash_value_with_optional_namespace(:wl, :readonly, hash),
           entry_count: hash_value_with_optional_namespace(:wl, :entrycount, hash).to_i,
           last_change: hash_value_with_optional_namespace(:wl, :lastchange, hash)
         )
@@ -23,7 +24,7 @@ module Symgate
       protected
 
       def attributes
-        %i[name context uuid entry_count last_change engine scope]
+        %i[name context uuid entry_count last_change engine scope readonly]
       end
     end
   end

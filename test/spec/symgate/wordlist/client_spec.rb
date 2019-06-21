@@ -173,6 +173,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect do
         resp = client.create_wordlist('foo',
                                       'User',
+                                      false,
                                       [
                                         Symgate::Wordlist::Entry.new(
                                           word: 'cat',
@@ -243,6 +244,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect do
         resp = client.create_wordlist('foo',
                                       'User',
+                                      false,
                                       [
                                         Symgate::Wordlist::Entry.new(
                                           word: 'cat',
@@ -326,6 +328,29 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
       expect { client.create_wordlist('foo', 'Lexical') }.not_to raise_error
+    end
+
+    it 'creates read-only wordlists' do
+      savon.expects(:create_wordlist)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           name: 'foo',
+                           context: 'User',
+                           scope: 'User',
+                           readonly: true })
+          .returns(File.read('test/spec/fixtures/xml/create_readonly_wordlist.xml'))
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      resp = client.create_wordlist('foo', 'User', true)
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.name).to eq('foo')
+      expect(resp.context).to eq('User')
+      expect(resp.scope).to eq('User')
+      expect(resp.uuid).to match(
+                               /[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/
+                           )
+      expect(resp.last_change).to be_a(DateTime)
+      expect(resp.engine).to eq('sql')
+      expect(resp.readonly).to eq(true)
     end
   end
 
