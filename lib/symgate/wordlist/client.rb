@@ -132,11 +132,12 @@ module Symgate
 
       # creates a wordlist from the supplied cfwl data, in the requested context
       # if 'preserve_uuid' is true, the new wordlist will have the same uuid as the file
-      def create_wordlist_from_cfwl_data(raw_cfwl_data, context, preserve_uuid)
+      def create_wordlist_from_cfwl_data(raw_cfwl_data, context, preserve_uuid, readonly = false)
         savon_request(:create_wordlist_from_cfwl_data) do |soap|
           soap.message(cfwl: Base64.encode64(raw_cfwl_data),
                        context: context,
-                       preserve_uuid: preserve_uuid)
+                       preserve_uuid: preserve_uuid,
+                       readonly: readonly)
         end.body[:create_wordlist_from_cfwl_data_response][:uuid]
       end
 
