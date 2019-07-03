@@ -173,7 +173,6 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect do
         resp = client.create_wordlist('foo',
                                       'User',
-                                      false,
                                       [
                                         Symgate::Wordlist::Entry.new(
                                           word: 'cat',
@@ -244,7 +243,6 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect do
         resp = client.create_wordlist('foo',
                                       'User',
-                                      false,
                                       [
                                         Symgate::Wordlist::Entry.new(
                                           word: 'cat',
@@ -330,7 +328,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect { client.create_wordlist('foo', 'Lexical') }.not_to raise_error
     end
 
-    it 'creates read-only wordlists' do
+    it 'creates a read-only wordlist' do
       savon.expects(:create_wordlist)
           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
                            name: 'foo',
@@ -340,16 +338,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
           .returns(File.read('test/spec/fixtures/xml/create_readonly_wordlist.xml'))
 
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
-      resp = client.create_wordlist('foo', 'User', true)
-      expect(resp).to be_a(Symgate::Wordlist::Info)
-      expect(resp.name).to eq('foo')
-      expect(resp.context).to eq('User')
-      expect(resp.scope).to eq('User')
-      expect(resp.uuid).to match(
-                               /[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/
-                           )
-      expect(resp.last_change).to be_a(DateTime)
-      expect(resp.engine).to eq('sql')
+      resp = client.create_wordlist('foo', 'User', readonly: true)
       expect(resp.readonly).to eq(true)
     end
   end
@@ -771,6 +760,31 @@ RSpec.describe(Symgate::Wordlist::Client) do
       end.not_to raise_error
 
       expect(resp).to eq('6133cfec-0972-4c90-b952-6ab7d8304716')
+    end
+
+    it 'creates a read-only wordlist' do
+      savon.expects(:create_wordlist_from_cfwl_data)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           cfwl: Base64.encode64(get_cfwl),
+                           context: 'User',
+                           preserve_uuid: true })
+          .returns(File.read('test/spec/fixtures/xml/create_wordlist_from_cfwl_data.xml'))
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist_from_cfwl_data(get_cfwl, 'User', true, readonly: true)
+      end.not_to raise_error
+
+      savon.expects(:get_wordlist_info)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
+          .returns(File.read('test/spec/fixtures/xml/get_wordlist_info_readonly.xml'))
+      resp = nil
+      expect do
+        resp = client.get_wordlist_info(uuid)
+      end.not_to raise_error
+
+      expect(resp.readonly).to eq(true)
     end
   end
 end

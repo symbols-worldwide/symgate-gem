@@ -112,6 +112,15 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.entry_count).to eq(1)
       expect(client.get_wordlist_info(resp.uuid).entry_count).to eq(1)
     end
+
+    it 'creates a read-only wordlist' do
+      resp = nil
+
+      expect { resp = client.create_wordlist('foo', 'User', readonly: true) }
+          .not_to raise_error
+
+      expect(resp.readonly).to eq(true)
+    end
   end
 
   describe '#enumerate_wordlists' do
@@ -978,6 +987,20 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(client.get_wordlist_info(uuid).context).to eq('Topic')
 
       expect(client.get_wordlist_entries(uuid).first.word).to eq('trash')
+    end
+
+    it 'creates a read-only wordlist' do
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist_from_cfwl_data(
+            get_cfwl,
+            'Topic',
+            false,
+            readonly: true
+        )
+      end.not_to raise_error
+
+      expect(client.get_wordlist_info(uuid).readonly).to eq(true)
     end
 
     it 'preserves the uuid when requested' do
