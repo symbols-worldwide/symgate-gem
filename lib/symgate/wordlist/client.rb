@@ -27,12 +27,12 @@ module Symgate
 
       # creates a wordlist with the specified name, context and scope (see auth:scope).
       # optionally, supply a list of entries to form the wordlist's initial content
-      def create_wordlist(name, context, entries = [])
+      def create_wordlist(name, context, entries = [], readonly: false)
         tries ||= 3 # TODO: Find out if we still need to do this!
 
         Symgate::Wordlist::Info.from_soap(
           savon_request(:create_wordlist) do |soap|
-            soap.message(soap_params_for_create_wordlist(name, context, entries))
+            soap.message(soap_params_for_create_wordlist(name, context, readonly, entries))
           end.body[:create_wordlist_response][:wordlistinfo]
         )
       rescue Symgate::Error => e
@@ -132,11 +132,12 @@ module Symgate
 
       # creates a wordlist from the supplied cfwl data, in the requested context
       # if 'preserve_uuid' is true, the new wordlist will have the same uuid as the file
-      def create_wordlist_from_cfwl_data(raw_cfwl_data, context, preserve_uuid)
+      def create_wordlist_from_cfwl_data(raw_cfwl_data, context, preserve_uuid, readonly: false)
         savon_request(:create_wordlist_from_cfwl_data) do |soap|
           soap.message(cfwl: Base64.encode64(raw_cfwl_data),
                        context: context,
-                       preserve_uuid: preserve_uuid)
+                       preserve_uuid: preserve_uuid,
+                       readonly: readonly)
         end.body[:create_wordlist_from_cfwl_data_response][:uuid]
       end
 
@@ -153,11 +154,12 @@ module Symgate
         end
       end
 
-      def soap_params_for_create_wordlist(name, context, entries)
+      def soap_params_for_create_wordlist(name, context, readonly, entries)
         {
           name: name,
           context: context,
-          scope: scope_for_context(context)
+          scope: scope_for_context(context),
+          readonly: readonly
         }.merge(
           entries ? { %s(wl:wordlistentry) => entries.map(&:to_soap) } : {}
         )

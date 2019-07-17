@@ -327,6 +327,20 @@ RSpec.describe(Symgate::Wordlist::Client) do
       client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
       expect { client.create_wordlist('foo', 'Lexical') }.not_to raise_error
     end
+
+    it 'creates a read-only wordlist' do
+      savon.expects(:create_wordlist)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           name: 'foo',
+                           context: 'User',
+                           scope: 'User',
+                           readonly: true })
+          .returns(File.read('test/spec/fixtures/xml/create_readonly_wordlist.xml'))
+
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      resp = client.create_wordlist('foo', 'User', readonly: true)
+      expect(resp.readonly).to eq(true)
+    end
   end
 
   describe '#destroy_wordlist' do
@@ -746,6 +760,31 @@ RSpec.describe(Symgate::Wordlist::Client) do
       end.not_to raise_error
 
       expect(resp).to eq('6133cfec-0972-4c90-b952-6ab7d8304716')
+    end
+
+    it 'creates a read-only wordlist' do
+      savon.expects(:create_wordlist_from_cfwl_data)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           cfwl: Base64.encode64(get_cfwl),
+                           context: 'User',
+                           preserve_uuid: true })
+          .returns(File.read('test/spec/fixtures/xml/create_wordlist_from_cfwl_data.xml'))
+      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      uuid = nil
+      expect do
+        uuid = client.create_wordlist_from_cfwl_data(get_cfwl, 'User', true, readonly: true)
+      end.not_to raise_error
+
+      savon.expects(:get_wordlist_info)
+          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+                           wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
+          .returns(File.read('test/spec/fixtures/xml/get_wordlist_info_readonly.xml'))
+      resp = nil
+      expect do
+        resp = client.get_wordlist_info(uuid)
+      end.not_to raise_error
+
+      expect(resp.readonly).to eq(true)
     end
   end
 end
