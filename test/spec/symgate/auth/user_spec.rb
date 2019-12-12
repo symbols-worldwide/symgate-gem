@@ -13,9 +13,9 @@ RSpec.describe(Symgate::Auth::User) do
   end
 
   it 'allows construction from a hash' do
-    u = Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true)
+    u = Symgate::Auth::User.new(user_id: test_user_details[:user], is_group_admin: true)
 
-    expect(u.user_id).to eq('foo/bar')
+    expect(u.user_id).to eq(test_user_details[:user])
     expect(u.is_group_admin).to eq(true)
   end
 

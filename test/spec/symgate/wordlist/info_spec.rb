@@ -2,8 +2,6 @@ require_relative '../../spec_helper.rb'
 
 require 'symgate/wordlist/info'
 
-# rubocop:disable Style/DateTime
-
 RSpec.describe(Symgate::Wordlist::Info) do
   it 'allows access to all attributes' do
     i = Symgate::Wordlist::Info.new
@@ -87,5 +85,3 @@ RSpec.describe(Symgate::Wordlist::Info) do
     expect(i.to_s).to include('512')
   end
 end
-
-# rubocop:enable Style/DateTime

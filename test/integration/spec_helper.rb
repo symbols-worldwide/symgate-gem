@@ -2,27 +2,16 @@ require 'rspec'
 require 'mysql2'
 require 'savon'
 require 'symgate/wordlist/entry'
-
-# rubocop:disable Naming/AccessorMethodName
-
-def symboliser_config
-  {
-      :db_host => '127.0.0.1',
-      :db_port => 33306,
-      :db_name => 'symboliser',
-      :db_username => 'symboliser',
-      :db_password => 'symboliser',
-      :soap_endpoint => 'http://localhost:11122/'
-  }
-end
+require_relative '../shared_spec_helper'
+require_relative '../config/symboliser_config'
 
 def integration_mysql_client
-  config = symboliser_config
-  Mysql2::Client.new(host: config[:db_host],
-                     port: config[:db_port],
-                     username: config[:db_username],
-                     password: config[:db_password],
-                     database: config[:db_name])
+  db_config = SymboliserConfig.config['database']
+  Mysql2::Client.new(host: db_config['host'],
+                     port: db_config['port'],
+                     username: db_config['username'],
+                     password: db_config['password'],
+                     database: db_config['name'])
 end
 
 def savon_opts
@@ -44,7 +33,8 @@ end
 def account_key_client_of_type(client_type)
   client_type.new(account: 'integration',
                   key: 'x',
-                  endpoint: symboliser_config[:soap_endpoint],
+                  endpoint: SymboliserConfig.config['soap_endpoint'],
+                  wsdl: SymboliserConfig.config['wsdl'],
                   savon_opts: savon_opts)
 end
 
@@ -52,7 +42,8 @@ def user_password_client_of_type(client_type, user, password)
   client_type.new(account: 'integration',
                   user: user,
                   password: password,
-                  endpoint: symboliser_config[:soap_endpoint],
+                  endpoint: SymboliserConfig.config['soap_endpoint'],
+                  wsdl: SymboliserConfig.config['wsdl'],
                   savon_opts: savon_opts)
 end
 
@@ -60,7 +51,8 @@ def user_token_client_of_type(client_type, user, token)
   client_type.new(account: 'integration',
                   user: user,
                   token: token,
-                  endpoint: symboliser_config[:soap_endpoint],
+                  endpoint: SymboliserConfig.config['soap_endpoint'],
+                  wsdl: SymboliserConfig.config['wsdl'],
                   savon_opts: savon_opts)
 end
 
@@ -91,5 +83,3 @@ def reset_wordlist_entry_times(array, datetime)
     entry
   end
 end
-
-# rubocop:enable Naming/AccessorMethodName

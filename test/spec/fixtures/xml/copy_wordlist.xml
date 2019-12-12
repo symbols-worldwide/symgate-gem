@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://ws.widgit.com/schema/globaltypes/1.2"
+  xmlns:cml2="http://ws.widgit.com/schema/cml/2.0"
+  xmlns:wl1x2="http://ws.widgit.com/schema/wordlist/1.2"
+  xmlns:auth="http://ws.widgit.com/schema/auth/1.2"
+  xmlns:symboliser1x2="http://ws.widgit.com/schema/symboliser/1.2">
+ <SOAP-ENV:Body>
+  <symboliser1x2:copyWordlistResponse>
+   <wl1x2:wordlistinfo>
+    <wl1x2:name>foo</wl1x2:name>
+    <wl1x2:context>Topic</wl1x2:context>
+    <wl1x2:uuid>{960dd9fd-5db9-4f85-98c0-0d6690bd29f1}</wl1x2:uuid>
+    <wl1x2:entrycount>10</wl1x2:entrycount>
+    <wl1x2:lastchange>2012-10-10T10:10:10Z</wl1x2:lastchange>
+    <wl1x2:engine>sql</wl1x2:engine>
+    <wl1x2:scope>User</wl1x2:scope>
+   </wl1x2:wordlistinfo>
+  </symboliser1x2:copyWordlistResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -37,8 +37,8 @@ module Symgate
         )
       rescue Symgate::Error => e
         # Handle SOS-105 (sometimes the wordlist is created but the symboliser claims it can't
-        # find it and sends a SOAP error back) by extract the wordlist UUID from the error message.
-        # Yes, this is not nice.
+        # find it and sends a SOAP error back) by extracting the wordlist UUID from the error
+        # message. Yes, this is not nice.
         match = /^No wordlist found for ID: ({[0-9a-f-]{36}})$/.match(e.detail)
 
         return get_wordlist_info(match[1]) if match
@@ -64,6 +64,28 @@ module Symgate
 
         Symgate::Wordlist::Info.from_soap(
           response.body[:get_wordlist_info_response][:wordlistinfo]
+        )
+      end
+
+      # Copies a wordlist with the specified UUID with optional parameters to specify the destination wordlist UUID, the
+      # context, name and readonlyness of the destination wordlist, source and destination group and/or user
+      def copy_wordlist(src_uuid, dest_uuid: nil, context: nil, name: nil, readonly: nil,
+                        src_group: nil, src_user: nil, dest_group: nil, dest_user: nil)
+        response = savon_request(:copy_wordlist) do |soap|
+          params = { srcwordlistuuid: src_uuid }
+          params[:dstwordlistuuid] = dest_uuid unless dest_uuid.nil?
+          params[:context] = context unless context.nil?
+          params[:name] = name unless name.nil?
+          params[:readonly] = readonly unless readonly.nil?
+          params[:srcgroup] = src_group unless src_group.nil?
+          params[:srcusername] = src_user unless src_user.nil?
+          params[:dstgroup] = dest_group unless dest_group.nil?
+          params[:dstusername] = dest_user unless dest_user.nil?
+          soap.message(params)
+        end
+
+        Symgate::Wordlist::Info.from_soap(
+          response.body[:copy_wordlist_response][:wordlistinfo]
         )
       end
 

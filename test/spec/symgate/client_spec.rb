@@ -11,39 +11,39 @@ RSpec.describe(Symgate::Client) do
     end
 
     it 'throws a Symgate error when called with an account, but no key or user' do
-      expect { Symgate::Client.new(account: 'foo') }.to raise_error(
+      expect { client_of_type(Symgate::Client, account: 'foo') }.to raise_error(
         Symgate::Error, 'No key or user specified'
       )
     end
 
     it 'throws a Symgate error when called with both a key and user' do
-      expect { Symgate::Client.new(account: 'foo', key: 'bar', user: 'baz') }.to raise_error(
+      expect { client_of_type(Symgate::Client, account: 'foo', key: 'bar', user: 'baz') }.to raise_error(
         Symgate::Error, 'Both key and user were specified'
       )
     end
 
     it 'create a valid client if an account and key are specified' do
       client = nil
-      expect { client = Symgate::Client.new(account: 'foo', key: 'bar') }.not_to raise_error
+      expect { client = client_of_type(Symgate::Client, account: 'foo', key: 'bar') }.not_to raise_error
       expect(client.savon_client).to be_a(Savon::Client)
     end
 
     it 'throws a Symgate error when called with a user but no password or token' do
-      expect { Symgate::Client.new(account: 'foo', user: 'bar') }.to raise_error(
+      expect { client_of_type(Symgate::Client, account: 'foo', user: 'bar') }.to raise_error(
         Symgate::Error, 'You must supply one of key, password or token'
       )
     end
 
     it 'throws a Symgate error when called with a user with a password and a token' do
       opts = { account: 'foo', user: 'bar', password: 'baz', token: 'nuts' }
-      expect { Symgate::Client.new(opts) }.to raise_error(
+      expect { client_of_type(Symgate::Client, opts) }.to raise_error(
         Symgate::Error, 'You must supply one of key, password or token'
       )
     end
 
     it 'throws a Symgate error when called with a key and password' do
       opts = { account: 'foo', key: 'bar', password: 'baz' }
-      expect { Symgate::Client.new(opts) }.to raise_error(
+      expect { client_of_type(Symgate::Client, opts) }.to raise_error(
         Symgate::Error, 'You must supply one of key, password or token'
       )
     end
@@ -51,14 +51,14 @@ RSpec.describe(Symgate::Client) do
     it 'creates a valid client when called with a user and password' do
       opts = { account: 'foo', user: 'bar', password: 'baz' }
       client = nil
-      expect { client = Symgate::Client.new(opts) }.not_to raise_error
+      expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
       expect(client.savon_client).to be_a(Savon::Client)
     end
 
     it 'creates a valid client when called with a user and token' do
       opts = { account: 'foo', user: 'bar', token: 'baz' }
       client = nil
-      expect { client = Symgate::Client.new(opts) }.not_to raise_error
+      expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
       expect(client.savon_client).to be_a(Savon::Client)
     end
   end
@@ -69,18 +69,18 @@ RSpec.describe(Symgate::Client) do
     end
 
     it 'returns a hash' do
-      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
       expect(client.savon_creds).to be_a(Hash)
     end
 
     it 'adds the account and key to the hash, when specified' do
-      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
       expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
                                                            %s(auth:key) => 'bar' })
     end
 
     it 'adds the user and password to the hash, when specified' do
-      client = Symgate::Client.new(account: 'foo', user: 'bar', password: 'baz')
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'bar', password: 'baz')
       expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
                                                            %s(auth:user) => {
                                                              %s(auth:id) => 'bar',
@@ -89,7 +89,7 @@ RSpec.describe(Symgate::Client) do
     end
 
     it 'adds the user and token to the hash, when specified' do
-      client = Symgate::Client.new(account: 'foo', user: 'bar', token: 'baz')
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'bar', token: 'baz')
       expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
                                                            %s(auth:user) => {
                                                              %s(auth:id) => 'bar',
@@ -104,7 +104,7 @@ RSpec.describe(Symgate::Client) do
     end
 
     it 'fails when an unknown method is called' do
-      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
       expect { client.savon_request(:make_pancakes) }.to raise_error(Savon::UnknownOperationError)
     end
 
@@ -114,7 +114,7 @@ RSpec.describe(Symgate::Client) do
                                                 %s(auth:key) => 'bar' } })
            .returns(File.read('test/spec/fixtures/xml/access_denied.xml'))
 
-      client = Symgate::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
       expect { |b| client.savon_request(:enumerate_groups, &b) }.to raise_error do |e|
         expect(e).to be_a(Symgate::Error)
         expect(e.message).to include('Access denied')

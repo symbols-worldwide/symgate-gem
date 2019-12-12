@@ -4,17 +4,22 @@ require 'symgate/auth/client'
 require 'symgate/wordlist/client'
 require 'symgate/wordlist/entry'
 
-# rubocop:disable Style/DateTime
-
 RSpec.describe(Symgate::Wordlist::Client) do
   non_lexical_contexts = %w[Topic SymbolSet User Attached Document]
 
   def client
-    user_password_client_of_type(Symgate::Wordlist::Client, 'foo/bar', 'baz')
+    user_password_client_of_type(Symgate::Wordlist::Client, test_user_details[:user],
+                                 test_user_details[:password])
   end
 
   def non_admin_client
-    user_password_client_of_type(Symgate::Wordlist::Client, 'foo/baz', 'qux')
+    user_password_client_of_type(Symgate::Wordlist::Client, test_second_user_details[:user],
+                                 test_second_user_details[:password])
+  end
+
+  def non_admin_second_user_client
+    user_password_client_of_type(Symgate::Wordlist::Client, test_third_user_details[:user],
+                                 test_third_user_details[:password])
   end
 
   def account_key_client
@@ -23,12 +28,27 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
   before(:each) do
     auth_client = account_key_client_of_type(Symgate::Auth::Client)
-    auth_client.create_group('foo')
+    auth_client.create_group(test_user_group)
 
     [
-      [Symgate::Auth::User.new(user_id: 'foo/bar', is_group_admin: true), 'baz'],
-      [Symgate::Auth::User.new(user_id: 'foo/baz', is_group_admin: false), 'qux']
+      [
+        Symgate::Auth::User.new(user_id: test_user_details[:user], is_group_admin: true),
+        test_user_details[:password]
+      ],
+      [
+        Symgate::Auth::User.new(user_id: test_second_user_details[:user], is_group_admin: false),
+        test_second_user_details[:password]
+      ],
+      [
+        Symgate::Auth::User.new(user_id: test_third_user_details[:user], is_group_admin: false),
+        test_third_user_details[:password]
+      ]
     ].each { |u| auth_client.create_user(u[0], u[1]) }
+  end
+
+  after(:each) do
+    auth_client = account_key_client_of_type(Symgate::Auth::Client)
+    auth_client.destroy_group(test_user_group)
   end
 
   describe '#create_wordlist' do
@@ -117,7 +137,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
       resp = nil
 
       expect { resp = client.create_wordlist('foo', 'User', readonly: true) }
-          .not_to raise_error
+        .not_to raise_error
 
       expect(resp.readonly).to eq(true)
     end
@@ -993,10 +1013,10 @@ RSpec.describe(Symgate::Wordlist::Client) do
       uuid = nil
       expect do
         uuid = client.create_wordlist_from_cfwl_data(
-            get_cfwl,
-            'Topic',
-            false,
-            readonly: true
+          get_cfwl,
+          'Topic',
+          false,
+          readonly: true
         )
       end.not_to raise_error
 
@@ -1071,6 +1091,248 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(data.length).to eq(get_cfwl.length)
     end
   end
-end
 
-# rubocop:enable Style/DateTime
+  describe '#copy_wordlist' do
+    it 'raises an error if the wordlist does not exist' do
+      expect { client.copy_wordlist('789bfe3d-9b81-48de-9fc0-5507318b6ab3') }.to raise_error(Symgate::Error)
+    end
+
+    it 'allows an admin user to copy a topic wordlist' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      expect { resp = client.copy_wordlist(src_uuid) }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.name).to eq('foo')
+      expect(resp.context).to eq('Topic')
+      expect(resp.entry_count).to be_a(Integer)
+      expect(resp.entry_count).to eq(1)
+      expect(resp.last_change).to be_a(DateTime)
+      expect(resp.last_change).to be > DateTime.now - 30
+      expect(resp.last_change).to be <= DateTime.now
+      expect(resp.engine).to eq('sql')
+      expect(resp.uuid).to match(/^{[0-9a-f-]{36}}$/)
+    end
+
+    it 'allows specifying the UUID of the copy' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      expect { resp = client.copy_wordlist(src_uuid, dest_uuid: dest_uuid) }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.uuid).to eq(dest_uuid)
+    end
+
+    it 'allows specifying the context of the copy' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      expect { resp = client.copy_wordlist(src_uuid, dest_uuid: dest_uuid, context: 'Document') }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.context).to eq('Document')
+    end
+
+    it 'allows specifying the name of the copy' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      expect { resp = client.copy_wordlist(src_uuid, dest_uuid: dest_uuid, name: 'Wombat') }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.name).to eq('Wombat')
+    end
+
+    it 'allows specifying the readonlyness of the copy' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      expect { resp = client.copy_wordlist(src_uuid, dest_uuid: dest_uuid, readonly: true) }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.readonly).to eq(true)
+    end
+
+    it 'allows copying the wordlist to a different user in same group' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      dest_user = test_second_user_details
+      expect do
+        resp = client.copy_wordlist(src_uuid,
+                                    dest_uuid: dest_uuid,
+                                    dest_group: dest_user[:group],
+                                    dest_user: dest_user[:user])
+      end.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+
+      expect(non_admin_client.get_wordlist_info(resp.uuid).entry_count).to eq(1)
+    end
+
+    it 'allows admin user to copy a wordlist between users in same group' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+      src_user = test_second_user_details
+      dest_user = test_third_user_details
+      expect do
+        resp = client.copy_wordlist(src_uuid,
+                                    dest_uuid: dest_uuid,
+                                    src_group: src_user[:group],
+                                    src_user: src_user[:user],
+                                    dest_group: dest_user[:group],
+                                    dest_user: dest_user[:user])
+      end.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+
+      expect(non_admin_second_user_client.get_wordlist_info(resp.uuid).entry_count).to eq(1)
+    end
+
+    it 'allows account to copy a wordlist between users in different groups' do
+      src_uuid = client.create_wordlist(
+        'foo',
+        'Topic',
+        [
+          Symgate::Wordlist::Entry.new(
+            word: 'cat',
+            uuid: 'c0fb70eb-0833-4572-86ef-cdb8edf8a6c1',
+            priority: 0,
+            last_change: DateTime.now,
+            symbols: [
+              Symgate::Cml::Symbol.new(main: 'foo.svg')
+            ]
+          )
+        ]
+      ).uuid
+
+      resp = nil
+      dest_uuid = '{0ee17dd0-2410-4e8a-bac6-57d67bfbef87}'
+
+      src_user_group, src_user_user = test_second_user_details[:user].split('/')
+      auth_client = account_key_client_of_type(Symgate::Auth::Client)
+      account_wordlist_client = account_key_client_of_type(Symgate::Wordlist::Client)
+      expect { auth_client.create_group('bar') }.not_to raise_error
+
+      dest_user_group = 'bar'
+      dest_user_user = 'baz'
+      dest_user_id = "#{dest_user_group}/#{dest_user_user}"
+      dest_user_password = 'qux'
+      dest_user = Symgate::Auth::User.new(user_id: dest_user_id, is_group_admin: false)
+      expect { auth_client.create_user(dest_user, dest_user_password) }.not_to raise_error
+
+      expect do
+        resp = account_wordlist_client.copy_wordlist(src_uuid,
+                                                     dest_uuid: dest_uuid,
+                                                     src_group: src_user_group,
+                                                     src_user: src_user_user,
+                                                     dest_group: dest_user_group,
+                                                     dest_user: dest_user_user)
+      end.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+
+      dest_user_client = user_password_client_of_type(Symgate::Wordlist::Client, dest_user_id, dest_user_password)
+      expect(dest_user_client.get_wordlist_info(resp.uuid).entry_count).to eq(1)
+    end
+  end
+end

@@ -3,25 +3,23 @@ require_relative '../../spec_helper.rb'
 require 'symgate/wordlist/client'
 require 'base64'
 
-# rubocop:disable Style/DateTime
-
 RSpec.describe(Symgate::Wordlist::Client) do
   describe '#enumerate_wordlists' do
     it 'returns an empty array if there are no wordlists' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz') })
+           .with(message: { %s(auth:creds) => test_user_password_creds })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_empty.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect(client.enumerate_wordlists).to match_array([])
     end
 
     it 'returns an array of one Item if there is one item' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz') })
+           .with(message: { %s(auth:creds) => test_user_password_creds })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_one.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect(client.enumerate_wordlists).to match_array(
         [
           Symgate::Wordlist::Info.new(name: 'foo',
@@ -37,10 +35,10 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'returns an array of two Items if there are two items' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz') })
+           .with(message: { %s(auth:creds) => test_user_password_creds })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_two.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect(client.enumerate_wordlists).to match_array(
         [
           Symgate::Wordlist::Info.new(name: 'foo',
@@ -63,11 +61,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts a filter of a single context' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             context: %w[User] })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_one.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect(client.enumerate_wordlists('User')).to match_array(
         [
           Symgate::Wordlist::Info.new(name: 'foo',
@@ -83,11 +81,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts a filter of an array of contexts' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             context: %w[User Lexical] })
            .returns(File.read('test/spec/fixtures/xml/enumerate_wordlists_one.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect(client.enumerate_wordlists(%w[User Lexical])).to match_array(
         [
           Symgate::Wordlist::Info.new(name: 'foo',
@@ -103,11 +101,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'raises an error when passed an invalid context' do
       savon.expects(:enumerate_wordlists)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             context: %w[Teapot] })
            .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.enumerate_wordlists('Teapot') }.to raise_error(Symgate::Error)
     end
   end
@@ -115,14 +113,14 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#create_wordlist' do
     it 'returns information about a new wordlist when one is created' do
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'User',
                             scope: 'User',
                             %s(wl:wordlistentry) => [] })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       resp = nil
       expect { resp = client.create_wordlist('foo', 'User') }.not_to raise_error
@@ -142,7 +140,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts an array of wordlist entries when creating the wordlist' do
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'User',
                             scope: 'User',
@@ -167,7 +165,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
                             }] })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       resp = nil
       expect do
@@ -208,7 +206,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'defers to get_wordlist_info if it receives a "no wordlist for id" error' do
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'User',
                             scope: 'User',
@@ -233,11 +231,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
                             }] })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist_no_wordlist.xml'))
       savon.expects(:get_wordlist_info)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '{1c257ded-4e07-4fcf-be72-2126f368cecd}' })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_info.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       resp = nil
       expect do
@@ -283,33 +281,33 @@ RSpec.describe(Symgate::Wordlist::Client) do
              .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
       end
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.create_wordlist('foo', 'bar') }.to raise_error(Symgate::Error)
     end
 
     it 'sends group scope when using topic or sybol-set wordlists' do
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'User',
                             scope: 'User' })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'Topic',
                             scope: 'Group' })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'SymbolSet',
                             scope: 'Group' })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.create_wordlist('foo', 'User') }.not_to raise_error
       expect { client.create_wordlist('foo', 'Topic') }.not_to raise_error
       expect { client.create_wordlist('foo', 'SymbolSet') }.not_to raise_error
@@ -318,26 +316,26 @@ RSpec.describe(Symgate::Wordlist::Client) do
     it 'sends account scope when using lexical wordlists' do
       # note, currently you can't actually do this with the API, so it's raising an error
       savon.expects(:create_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             name: 'foo',
                             context: 'Lexical',
                             scope: 'Account' })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.create_wordlist('foo', 'Lexical') }.not_to raise_error
     end
 
     it 'creates a read-only wordlist' do
       savon.expects(:create_wordlist)
-          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                           name: 'foo',
-                           context: 'User',
-                           scope: 'User',
-                           readonly: true })
-          .returns(File.read('test/spec/fixtures/xml/create_readonly_wordlist.xml'))
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            name: 'foo',
+                            context: 'User',
+                            scope: 'User',
+                            readonly: true })
+           .returns(File.read('test/spec/fixtures/xml/create_readonly_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = client.create_wordlist('foo', 'User', readonly: true)
       expect(resp.readonly).to eq(true)
     end
@@ -346,11 +344,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#destroy_wordlist' do
     it 'destroys a wordlist' do
       savon.expects(:destroy_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
            .returns(File.read('test/spec/fixtures/xml/destroy_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       expect { client.destroy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716') }.not_to raise_error
     end
@@ -362,7 +360,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
              .returns(File.read('test/spec/fixtures/xml/generic_error.xml'))
       end
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.destroy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716') }
         .to raise_error(Symgate::Error)
     end
@@ -371,11 +369,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#get_wordlist_info' do
     it 'returns information about the specified wordlist' do
       savon.expects(:get_wordlist_info)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_info.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -397,11 +395,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#get_wordlist_entries' do
     it 'returns an empty array if there are no entries' do
       savon.expects(:get_wordlist_entries)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries_empty.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -414,11 +412,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'returns all wordlist entries for a wordlist' do
       savon.expects(:get_wordlist_entries)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -435,12 +433,12 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts an option to return attachments' do
       savon.expects(:get_wordlist_entries)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             getattachments: true })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries_with_attachments.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -475,12 +473,12 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts an option to specify a single entry uuid' do
       savon.expects(:get_wordlist_entries)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             match: { entryid: '7bdc3511-6cb8-4d7b-9179-380afced746d' } })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries_one.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -499,12 +497,12 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'accepts an option to filter by word' do
       savon.expects(:get_wordlist_entries)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             match: { matchstring: 'cat' } })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries_one.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
 
       expect do
@@ -522,7 +520,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
 
     it 'raises an error if both a word and concept filter are supplied' do
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       expect do
         client.get_wordlist_entries('6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -532,7 +530,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
 
     it 'raises an error if an unknown option is supplied' do
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
       expect do
         client.get_wordlist_entries('6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -544,7 +542,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#insert_wordlist_entry' do
     it 'inserts an entry into a wordlist' do
       savon.expects(:insert_wordlist_entry)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             %s(wl:wordlistentry) => {
                               %s(wl:word) => 'cat',
@@ -558,7 +556,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
                             } })
            .returns(File.read('test/spec/fixtures/xml/insert_wordlist_entry.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.insert_wordlist_entry(
           '6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -576,7 +574,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'sends attached graphic data as base64-encoded' do
       savon.expects(:insert_wordlist_entry)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             %s(wl:wordlistentry) => {
                               %s(wl:word) => 'cat',
@@ -595,7 +593,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
                             } })
            .returns(File.read('test/spec/fixtures/xml/insert_wordlist_entry.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.insert_wordlist_entry(
           '6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -619,7 +617,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
 
     it 'throws an error if passed something other than a wordlist entry' do
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect { client.insert_wordlist_entry('6133cfec-0972-4c90-b952-6ab7d8304716', 'teapot') }
         .to raise_error(Symgate::Error)
     end
@@ -628,7 +626,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#overwrite_wordlist' do
     it 'overwrites a wordlist when passed a uuid and array of entries' do
       savon.expects(:overwrite_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             %s(wl:wordlistentry) => [{
                               %s(wl:word) => 'cat',
@@ -651,7 +649,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
                             }] })
            .returns(File.read('test/spec/fixtures/xml/overwrite_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.overwrite_wordlist(
           '6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -678,7 +676,7 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
 
     it 'throws an error if passed something other than an array of wordlist entries' do
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.overwrite_wordlist(
           '6133cfec-0972-4c90-b952-6ab7d8304716',
@@ -698,12 +696,12 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#remove_wordlist_entry' do
     it 'removes a wordlist entry when passed wordlist and entry uuids' do
       savon.expects(:remove_wordlist_entry)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             entryid: '5fa23e93-6844-424a-9c4d-f694dec52869' })
            .returns(File.read('test/spec/fixtures/xml/remove_wordlist_entry.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.remove_wordlist_entry('6133cfec-0972-4c90-b952-6ab7d8304716',
                                      '5fa23e93-6844-424a-9c4d-f694dec52869')
@@ -714,12 +712,12 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#rename_wordlist' do
     it 'renames a wordlist when passed a uuid and name' do
       savon.expects(:rename_wordlist)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716',
                             name: 'foo' })
            .returns(File.read('test/spec/fixtures/xml/rename_wordlist.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       expect do
         client.rename_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716',
                                'foo')
@@ -730,11 +728,11 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#get_wordlist_as_cfwl_data' do
     it 'returns a cfwl in binary format' do
       savon.expects(:get_wordlist_as_cfwl_data)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
            .returns(File.read('test/spec/fixtures/xml/get_wordlist_as_cfwl_data.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
       expect do
         resp = client.get_wordlist_as_cfwl_data('6133cfec-0972-4c90-b952-6ab7d8304716')
@@ -747,13 +745,13 @@ RSpec.describe(Symgate::Wordlist::Client) do
   describe '#create_wordlist_from_cfwl_data' do
     it 'sends the cfwl data in base64 format and returns the uuid of the new list' do
       savon.expects(:create_wordlist_from_cfwl_data)
-           .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
+           .with(message: { %s(auth:creds) => test_user_password_creds,
                             cfwl: Base64.encode64(get_cfwl),
                             context: 'User',
                             preserve_uuid: true })
            .returns(File.read('test/spec/fixtures/xml/create_wordlist_from_cfwl_data.xml'))
 
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       resp = nil
       expect do
         resp = client.create_wordlist_from_cfwl_data(get_cfwl, 'User', true)
@@ -764,21 +762,21 @@ RSpec.describe(Symgate::Wordlist::Client) do
 
     it 'creates a read-only wordlist' do
       savon.expects(:create_wordlist_from_cfwl_data)
-          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                           cfwl: Base64.encode64(get_cfwl),
-                           context: 'User',
-                           preserve_uuid: true })
-          .returns(File.read('test/spec/fixtures/xml/create_wordlist_from_cfwl_data.xml'))
-      client = Symgate::Wordlist::Client.new(account: 'foo', user: 'foo/bar', password: 'baz')
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            cfwl: Base64.encode64(get_cfwl),
+                            context: 'User',
+                            preserve_uuid: true })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist_from_cfwl_data.xml'))
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
       uuid = nil
       expect do
         uuid = client.create_wordlist_from_cfwl_data(get_cfwl, 'User', true, readonly: true)
       end.not_to raise_error
 
       savon.expects(:get_wordlist_info)
-          .with(message: { %s(auth:creds) => user_password_creds('foo', 'foo/bar', 'baz'),
-                           wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
-          .returns(File.read('test/spec/fixtures/xml/get_wordlist_info_readonly.xml'))
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            wordlistid: '6133cfec-0972-4c90-b952-6ab7d8304716' })
+           .returns(File.read('test/spec/fixtures/xml/get_wordlist_info_readonly.xml'))
       resp = nil
       expect do
         resp = client.get_wordlist_info(uuid)
@@ -787,6 +785,50 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.readonly).to eq(true)
     end
   end
-end
 
-# rubocop:enable Style/DateTime
+  describe '#copy_wordlist' do
+    it 'returns information about a new wordlist when one is copied' do
+      savon.expects(:copy_wordlist)
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            :srcwordlistuuid => '6133cfec-0972-4c90-b952-6ab7d8304716' })
+           .returns(File.read('test/spec/fixtures/xml/copy_wordlist.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      resp = nil
+      expect { resp = client.copy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716') }.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.name).to eq('foo')
+      expect(resp.context).to eq('Topic')
+      expect(resp.scope).to eq('User')
+      expect(resp.entry_count).to be_a(Integer)
+      expect(resp.entry_count).to eq(10)
+      expect(resp.uuid).to match(/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/)
+      expect(resp.last_change).to be_a(DateTime)
+      expect(resp.engine).to eq('sql')
+    end
+
+    it 'returns a new wordlist with the specified UUID when one is copied' do
+      savon.expects(:copy_wordlist)
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            :srcwordlistuuid => '6133cfec-0972-4c90-b952-6ab7d8304716',
+                            :dstwordlistuuid => '960dd9fd-5db9-4f85-98c0-0d6690bd29f1' })
+           .returns(File.read('test/spec/fixtures/xml/copy_wordlist.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      resp = nil
+      expect do
+        resp = client.copy_wordlist('6133cfec-0972-4c90-b952-6ab7d8304716',
+                                    dest_uuid: '960dd9fd-5db9-4f85-98c0-0d6690bd29f1')
+      end.not_to raise_error
+      expect(resp).to be_a(Symgate::Wordlist::Info)
+      expect(resp.name).to eq('foo')
+      expect(resp.context).to eq('Topic')
+      expect(resp.scope).to eq('User')
+      expect(resp.entry_count).to be_a(Integer)
+      expect(resp.entry_count).to eq(10)
+      expect(resp.uuid).to eq('{960dd9fd-5db9-4f85-98c0-0d6690bd29f1}')
+      expect(resp.last_change).to be_a(DateTime)
+      expect(resp.engine).to eq('sql')
+    end
+  end
+end

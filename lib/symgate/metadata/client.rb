@@ -2,8 +2,6 @@ require 'symgate/client'
 require 'symgate/error'
 require 'symgate/metadata/data_item'
 
-# rubocop:disable Naming/AccessorMethodName
-
 module Symgate
   module Metadata
     # client for the Symgate metadata system
@@ -70,5 +68,3 @@ module Symgate
     end
   end
 end
-
-# rubocop:enable Naming/AccessorMethodName
