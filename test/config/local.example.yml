@@ -1,0 +1,9 @@
+# You will need to create a local.yml for development. Settings in here will override settings from symboliser.yml.
+soap_endpoint: "SET_ME"
+wsdl: "SET_ME"
+database:
+  host: "SET_ME"
+  port: 3306
+  name: "SET_ME"
+  username: "SET_ME"
+  password: "SET_ME"

@@ -1,0 +1,9 @@
+# These config values are for the Vagrant VM recommended for development by the README.
+soap_endpoint: 'http://localhost:11122/'
+wsdl: 'http://localhost:11122/symboliser.wsdl'
+database:
+  host: '127.0.0.1'
+  port: 33306
+  name: 'symboliser'
+  username: 'symboliser'
+  password: 'symboliser'

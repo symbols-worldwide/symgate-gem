@@ -6,20 +6,47 @@ AllCops:
     - 'local-mode-cache/**/*'
     - 'symboliser-vagrant/**/*'
 
-Metrics/LineLength:
-  Max: 100
-
-Metrics/MethodLength:
-  Max: 12
-
 Style/NumericLiterals:
   MinDigits: 6
 
-Metrics/ClassLength:
+Style/DoubleNegation:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/DateTime:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Metrics/LineLength:
   Max: 120
 
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/ClassLength:
+  Max: 2000
+
 Metrics/BlockLength:
-  Max: 1000
+  Max: 2000
+
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/CyclomaticComplexity:
+  Max: 9
+
+Metrics/PerceivedComplexity:
+  Max: 9
+
+Metrics/ParameterLists:
+  Max: 9
 
 Naming/UncommunicativeMethodParamName:
   MinNameLength: 2
+
+Naming/AccessorMethodName:
+  Enabled: false

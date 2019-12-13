@@ -131,6 +131,10 @@ To shut down and destroy the VM completely, run `rake vagrant:destroy`
 
 Note that you need access to the Widgit CI server for this to work.
 
+Alternatively, in the highly unlikely event that the Vagrant stuff doesn't work, you can run the tests against some
+other running symboliser by copying `test/config/local.example.yml` to `test/config/local.yml` and editing `local.yml`
+to include the particulars of your symboliser endpoint, database and WSDL.
+
 ## License
 
 This project is licensed under the Apache License 2.0.

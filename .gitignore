@@ -17,3 +17,4 @@
 /vendor/
 /coverage/
 /coverage.zip
+/test/config/local.yml

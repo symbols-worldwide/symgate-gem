@@ -6,7 +6,7 @@ RSpec.describe(Symgate::Auth::Client) do
   describe 'request validation' do
     # Detect duplicate xmlns:symboliser attributes in <Envelope> element. See issue #3.
     it 'sends valid XML in the SOAP request' do
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/baz', password: 'frob')
       request = client.savon_client.build_request(:authenticate)
       doc = Nokogiri::XML(request.body)
       expect(doc.errors).to be_empty
@@ -19,7 +19,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array([])
     end
 
@@ -28,7 +28,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_one.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array(%w[one])
     end
 
@@ -37,7 +37,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => account_key_creds('foo', 'bar') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_two.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_groups).to match_array(%w[one two])
     end
   end
@@ -49,7 +49,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/create_group.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.create_group('baz') }.not_to raise_error
     end
   end
@@ -61,7 +61,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/destroy_group.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.destroy_group('baz') }.not_to raise_error
     end
   end
@@ -74,7 +74,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             new_groupid: 'turlingdrome' })
            .returns(File.read('test/spec/fixtures/xml/rename_group.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.rename_group('baz', 'turlingdrome') }.not_to raise_error
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_empty.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz')).to match_array([])
     end
 
@@ -96,7 +96,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_one.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz'))
         .to match_array([Symgate::Auth::User.new(user_id: 'boris')])
     end
@@ -107,7 +107,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_users_two.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_users('baz'))
         .to match_array([
                           Symgate::Auth::User.new(user_id: 'boris'),
@@ -125,7 +125,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             password: 'frob' })
            .returns(File.read('test/spec/fixtures/xml/create_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       user = Symgate::Auth::User.new(user_id: 'baz')
       expect { client.create_user(user, 'frob') }.not_to raise_error
     end
@@ -139,7 +139,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             attributes!: { %s(auth:user) => { id: 'baz', isGroupAdmin: true } } })
            .returns(File.read('test/spec/fixtures/xml/update_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       user = Symgate::Auth::User.new(user_id: 'baz', is_group_admin: true)
       expect { client.update_user(user) }.not_to raise_error
     end
@@ -153,7 +153,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             new_user_id: 'group/frob' })
            .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.rename_user('group/baz', 'group/frob') }.not_to raise_error
     end
   end
@@ -166,7 +166,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             new_user_id: 'frob/baz' })
            .returns(File.read('test/spec/fixtures/xml/rename_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.move_user('group/baz', 'frob/baz') }.not_to raise_error
     end
   end
@@ -179,7 +179,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             password: 'frob' })
            .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.set_user_password('group/baz', 'frob') }.not_to raise_error
     end
   end
@@ -191,7 +191,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             userid: 'group/baz' })
            .returns(File.read('test/spec/fixtures/xml/destroy_user.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect { client.destroy_user('group/baz') }.not_to raise_error
     end
   end
@@ -202,7 +202,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/baz', 'frob') })
            .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/baz', password: 'frob')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/baz', password: 'frob')
       token = nil
       expect { token = client.authenticate }.not_to raise_error
       expect(token).to eq('bananana')
@@ -214,7 +214,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             userid: 'group/baz' })
            .returns(File.read('test/spec/fixtures/xml/authenticate.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       token = nil
       expect { token = client.authenticate('group/baz') }.not_to raise_error
       expect(token).to eq('bananana')
@@ -229,7 +229,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/add_group_language.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       response = nil
       expect { response = client.add_group_language('baz', 'Swedish') }.not_to raise_error
       expect(response).to eq('OK')
@@ -242,7 +242,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/add_group_language_exists.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       response = nil
       expect { response = client.add_group_language('baz', 'English_UK') }.not_to raise_error
       expect(response).to eq('Exists')
@@ -257,7 +257,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/remove_group_language.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       response = nil
       expect { response = client.remove_group_language('baz', 'English_UK') }.not_to raise_error
       expect(response).to eq('OK')
@@ -270,7 +270,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/remove_group_language_not_exist.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       response = nil
       expect { response = client.remove_group_language('baz', 'Swedish') }.not_to raise_error
       expect(response).to eq('NotExist')
@@ -284,7 +284,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_empty.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_group_languages('baz')).to match_array([])
     end
 
@@ -294,7 +294,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_one.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_group_languages('baz')).to match_array(['English_UK'])
     end
 
@@ -304,7 +304,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             groupid: 'baz' })
            .returns(File.read('test/spec/fixtures/xml/enumerate_group_languages_two.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.enumerate_group_languages('baz')).to match_array(%w[English_UK Swedish])
     end
   end
@@ -317,7 +317,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/query_group_language_true.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.query_group_language('baz', 'English_UK')).to be_truthy
     end
 
@@ -328,7 +328,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/query_group_language_false.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', key: 'bar')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', key: 'bar')
       expect(client.query_group_language('baz', 'Swedish')).to be_falsey
     end
   end
@@ -339,7 +339,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_empty.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/bar', password: 'baz')
       expect(client.enumerate_languages).to match_array([])
     end
 
@@ -348,7 +348,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_one.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/bar', password: 'baz')
       expect(client.enumerate_languages).to match_array(['English_UK'])
     end
 
@@ -357,7 +357,7 @@ RSpec.describe(Symgate::Auth::Client) do
            .with(message: { %s(auth:creds) => user_password_creds('foo', 'group/bar', 'baz') })
            .returns(File.read('test/spec/fixtures/xml/enumerate_languages_two.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/bar', password: 'baz')
       expect(client.enumerate_languages).to match_array(%w[English_UK Swedish])
     end
   end
@@ -369,7 +369,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'English_UK' })
            .returns(File.read('test/spec/fixtures/xml/query_language_true.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/bar', password: 'baz')
       expect(client.query_language('English_UK')).to be_truthy
     end
 
@@ -379,7 +379,7 @@ RSpec.describe(Symgate::Auth::Client) do
                             language: 'Swedish' })
            .returns(File.read('test/spec/fixtures/xml/query_language_false.xml'))
 
-      client = Symgate::Auth::Client.new(account: 'foo', user: 'group/bar', password: 'baz')
+      client = client_of_type(Symgate::Auth::Client, account: 'foo', user: 'group/bar', password: 'baz')
       expect(client.query_language('Swedish')).to be_falsey
     end
   end

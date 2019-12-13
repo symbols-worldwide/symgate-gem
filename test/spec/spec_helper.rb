@@ -3,8 +3,8 @@ require 'savon/mock/spec_helper'
 require 'simplecov'
 require 'simplecov-teamcity-summary' if ENV['TEAMCITY_VERSION']
 require 'codecov' if ENV['TRAVIS']
-
-# rubocop:disable Naming/AccessorMethodName
+require_relative '../shared_spec_helper'
+require_relative '../config/symboliser_config'
 
 SimpleCov.start do
   minimum_coverage 100
@@ -65,5 +65,3 @@ def check_comparison_operator_for_member(o1, o2, member, bad_value, good_value)
   o2.instance_variable_set("@#{member}", good_value)
   expect(o1 == o2).to be_a(TrueClass)
 end
-
-# rubocop:enable Naming/AccessorMethodName
