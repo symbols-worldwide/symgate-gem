@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'codecov'
   spec.add_development_dependency 'mysql2', '~> 0.5.3'
   spec.add_development_dependency 'rack', '~> 1.6.11'
-  spec.add_development_dependency 'rake', '~> 13.0'
+  spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec', '~> 3.9.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
   spec.add_development_dependency 'rubocop', '~> 0.57.0'
