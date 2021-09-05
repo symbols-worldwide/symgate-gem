@@ -5,7 +5,7 @@ module Symgate
   class Error < StandardError
     attr_reader :original_error, :detail
 
-    # Initialises a symgate error from either a string or a savon error
+    # Initialises a symgate error from either a string or a Savon error
     def initialize(message)
       super(message)
     end

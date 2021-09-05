@@ -94,8 +94,9 @@ You can also initialise a client with the following options:
 
 | Option      |     |
 | ----------- | --- |
-| :endpoint   | Specifies the symbolisation SOAP endpoint to use, if not the public symbolisation server. |
-| :savon_opts | Specifies options to pass to the underlying savon engine. e.g. `{ log_level: :debug }` |
+| :endpoint                    | Specifies the symbolisation SOAP endpoint to use, if not the public symbolisation server. |
+| :savon_opts                  | Specifies options to pass to the underlying savon engine. e.g. `{ log_level: :debug }` |
+| :data_required_error_retries | Specifies the number of times to attempt a request when the response is 'Data required for operation'. |
 
 ### Errors
 
