@@ -6,7 +6,8 @@ module Symgate
   # A generic client for the Symgate API.
   # See the WSDL for full documentation
   class Client
-    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key, :savon_opts
+    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key, :savon_opts,
+                  :data_required_error_retries
     attr_reader :savon_client
 
     # Constructs a new client with the provided options
@@ -14,6 +15,7 @@ module Symgate
       @wsdl = 'https://ws.widgitonline.com/schema/symboliser.wsdl'
       @endpoint = 'https://ws.widgitonline.com/'
       @savon_opts = {}
+      @data_required_error_retries = 3
       opts.each { |k, v| instance_variable_set("@#{k}", v) }
 
       validate_client_options
@@ -83,16 +85,30 @@ module Symgate
     # sends a request to the server and yields a soap block for defining the
     # message body
     def savon_request(method, opts = {})
-      r = @savon_client.call(method) do |soap|
-        yield soap if block_given?
-        soap.message({}) if soap[:message].nil?
-        soap[:message].merge!(savon_creds)
-      end
+      attempts = 0
 
-      raise_error_on_string_response(r, "#{method}_response".to_sym) if opts[:returns_error_string]
-      r
-    rescue Savon::SOAPFault => e
-      raise Symgate::Error.from_savon(e)
+      begin
+        attempts += 1
+
+        r = @savon_client.call(method) do |soap|
+          yield soap if block_given?
+          soap.message({}) if soap[:message].nil?
+          soap[:message].merge!(savon_creds)
+        end
+
+        raise_error_on_string_response(r, "#{method}_response".to_sym) if opts[:returns_error_string]
+
+        r
+      rescue Savon::SOAPFault => e
+        # Allow a configurable number of retries for a 'Data required for operation' error. This is because the
+        # symboliser occasionally throw this error when it shouldn't and succeeds on retry. It's not ideal that we have
+        # to rely on the fault string, however.
+        if attempts < @data_required_error_retries && e.to_hash[:fault][:faultstring] == 'Data required for operation'
+          retry
+        end
+
+        raise Symgate::Error.from_savon(e)
+      end
     end
 
     def raise_error_on_string_response(response, response_type)

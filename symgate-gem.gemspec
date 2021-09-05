@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Simon Detheridge', 'Tim Down', 'Stu Wright']
   spec.email         = ['tim@widgit.com']
   spec.license       = 'Apache-2.0'
+  spec.required_ruby_version = '>= 2.1'
 
   spec.summary       = "Wrapper around Widgit's Symgate SOAP symboliser"
   spec.homepage      = 'https://github.com/symbols-worldwide/symgate-gem'
@@ -18,10 +19,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 1.9'
+  spec.add_development_dependency 'bundler', '~> 2.2'
   spec.add_development_dependency 'codecov', '~> 0.1.16'
   spec.add_development_dependency 'mysql2', '~> 0.5.3'
-  spec.add_development_dependency 'rack', '~> 1.6.11'
+  spec.add_development_dependency 'rack', '~> 2.2'
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec', '~> 3.9.0'
   spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
