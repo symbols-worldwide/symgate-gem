@@ -31,6 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.17.0'
   spec.add_development_dependency 'simplecov-teamcity-summary', '~> 1.0.0'
 
-  spec.add_dependency 'savon', '~> 2.12.0'
+  spec.add_dependency 'savon', '~> 2.15.1'
   spec.add_dependency 'tryit', '~> 0.0.1'
 end

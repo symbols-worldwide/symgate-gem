@@ -1,3 +1,8 @@
+## 0.4.2 (2025-12-01)
+
+Update Savon gem to 2.15.1 to allow compatibility with newer Rails versions
+Move symboliser-vagrant submodule to new Widgit bitbucket
+
 ## 0.4.1 (2021-09-06)
 
 Allow a configurable number of retries for a 'Data required for operation' error
