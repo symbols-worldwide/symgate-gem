@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Simon Detheridge', 'Tim Down', 'Stu Wright']
   spec.email         = ['tim@widgit.com']
   spec.license       = 'Apache-2.0'
-  spec.required_ruby_version = '>= 2.1'
+  spec.required_ruby_version = '>= 3.1.7'
 
   spec.summary       = "Wrapper around Widgit's Symgate SOAP symboliser"
   spec.homepage      = 'https://github.com/symbols-worldwide/symgate-gem'
@@ -19,18 +19,18 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 2.2'
-  spec.add_development_dependency 'codecov', '~> 0.1.16'
-  spec.add_development_dependency 'mysql2', '~> 0.5.3'
-  spec.add_development_dependency 'rack', '~> 2.2'
-  spec.add_development_dependency 'rake', '~> 12.0'
-  spec.add_development_dependency 'rspec', '~> 3.9.0'
-  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
-  spec.add_development_dependency 'rubocop', '~> 0.57.0'
+  spec.add_development_dependency 'bundler', '~> 2.6.9'
+  spec.add_development_dependency 'codecov', '~> 0.6.0'
+  spec.add_development_dependency 'mysql2', '~> 0.5.7'
+  spec.add_development_dependency 'rack', '~> 2.2.24'
+  spec.add_development_dependency 'rake', '~> 13.4'
+  spec.add_development_dependency 'rspec', '~> 3.13'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.6.2'
+  spec.add_development_dependency 'rubocop', '~> 1.92'
   spec.add_development_dependency 'rubocop-junit-formatter', '~> 0.1.4'
-  spec.add_development_dependency 'simplecov', '~> 0.17.0'
+  spec.add_development_dependency 'simplecov', '~> 0.21.2'
   spec.add_development_dependency 'simplecov-teamcity-summary', '~> 1.0.0'
 
-  spec.add_dependency 'savon', '~> 2.15.1'
+  spec.add_dependency 'savon', '~> 2.17.5'
   spec.add_dependency 'tryit', '~> 0.0.1'
 end

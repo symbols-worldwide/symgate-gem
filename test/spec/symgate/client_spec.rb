@@ -120,6 +120,20 @@ RSpec.describe(Symgate::Client) do
         expect(e.message).to include('Access denied')
       end
     end
+
+    it 'retries when the symboliser reports that data is required' do
+      message = { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                      %s(auth:key) => 'bar' } }
+      savon.expects(:enumerate_groups)
+           .with(message: message)
+           .returns(File.read('test/spec/fixtures/xml/data_required.xml'))
+      savon.expects(:enumerate_groups)
+           .with(message: message)
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      expect { client.savon_request(:enumerate_groups) }.not_to raise_error
+    end
   end
 
   describe '#savon_array' do

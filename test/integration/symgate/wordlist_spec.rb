@@ -1093,6 +1093,8 @@ RSpec.describe(Symgate::Wordlist::Client) do
   end
 
   describe '#copy_wordlist' do
+    before { skip 'copyWordlist is not implemented by the symboliser' }
+
     it 'raises an error if the wordlist does not exist' do
       expect { client.copy_wordlist('789bfe3d-9b81-48de-9fc0-5507318b6ab3') }.to raise_error(Symgate::Error)
     end

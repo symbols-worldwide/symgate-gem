@@ -20,7 +20,7 @@ Please note that a symbolisation client is scheduled for a future release.
 
 ## Prerequisites
 
-This gem works with Ruby 2.1 and above
+This gem works with Ruby 3.1.7 and above
 
 ## Installation
 

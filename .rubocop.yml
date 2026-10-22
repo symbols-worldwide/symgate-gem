@@ -1,5 +1,6 @@
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 3.1
+  NewCops: disable
   Exclude:
     - 'vendor/**/*'
     - '.chef/**/*'
@@ -21,7 +22,7 @@ Style/DateTime:
 Style/IfUnlessModifier:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
@@ -45,8 +46,33 @@ Metrics/PerceivedComplexity:
 Metrics/ParameterLists:
   Max: 9
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   MinNameLength: 2
 
 Naming/AccessorMethodName:
+  Enabled: false
+
+# RuboCop 1 enables these by default. The existing style is unchanged.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/RedundantBegin:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/RedundantFileExtensionInRequire:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Lint/UselessMethodDefinition:
   Enabled: false

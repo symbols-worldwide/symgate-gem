@@ -77,7 +77,7 @@ end
 namespace :vagrant do
   desc 'Boot the symboliser virtual machine'
   task :up do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       system 'bundle install --path vendor/bundle', chdir: 'symboliser-vagrant'
       system 'RUBYLIB= NOEXEC_DISABLE=1 vagrant up',
              chdir: 'symboliser-vagrant'
@@ -86,7 +86,7 @@ namespace :vagrant do
 
   desc 'Destroy the symboliser virtual machine'
   task :destroy do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       system 'RUBYLIB= NOEXEC_DISABLE=1 vagrant destroy --force',
              chdir: 'symboliser-vagrant'
     end

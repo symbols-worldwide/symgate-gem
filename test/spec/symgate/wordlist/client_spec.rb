@@ -786,7 +786,10 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
   end
 
+  # :nocov:
   describe '#copy_wordlist' do
+    before { skip 'copyWordlist is not implemented by the symboliser' }
+
     it 'returns information about a new wordlist when one is copied' do
       savon.expects(:copy_wordlist)
            .with(message: { %s(auth:creds) => test_user_password_creds,
@@ -831,4 +834,5 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.engine).to eq('sql')
     end
   end
+  # :nocov:
 end

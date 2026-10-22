@@ -1,3 +1,7 @@
+## Unreleased
+
+Require Ruby 3.1.7 and update Savon to 2.17.5
+
 ## 0.4.2 (2025-12-01)
 
 Update Savon gem to 2.15.1 to allow compatibility with newer Rails versions
