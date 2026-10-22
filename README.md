@@ -101,7 +101,8 @@ You can also initialise a client with the following options:
 ### Errors
 
 If any method call fails, it will raise a `Symgate::Error` exception. Examine the exception for further information
-on what went wrong.
+on what went wrong. A SOAP fault also exposes `fault_string`, `detail`, `request_xml`, and `response_xml`.
+`message`, `detail`, and `original_error` keep their existing values.
 
 ### Further documentation
 

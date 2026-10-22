@@ -1,5 +1,7 @@
 ## Unreleased
 
+Expose the SOAP fault string and the request and response XML on Symgate::Error
+
 Require Ruby 3.1.7 and update Savon to 2.17.5
 
 ## 0.4.2 (2025-12-01)
