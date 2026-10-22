@@ -1,6 +1,7 @@
 require 'savon'
 require 'symgate/error'
 require 'symgate/namespaces'
+require 'symgate/request_observer'
 
 module Symgate
   # A generic client for the Symgate API.
@@ -59,6 +60,7 @@ module Symgate
     end
 
     def create_savon_client
+      RequestObserver.install
       @savon_client = Savon.client(savon_opts.merge(wsdl: @wsdl, endpoint: @endpoint)) do
         endpoint(@endpoint) if @endpoint
         namespaces(Symgate::NAMESPACES)
@@ -89,6 +91,7 @@ module Symgate
 
       begin
         attempts += 1
+        RequestObserver.consume_request_xml
 
         r = @savon_client.call(method) do |soap|
           yield soap if block_given?
@@ -103,12 +106,18 @@ module Symgate
         # Allow a configurable number of retries for a 'Data required for operation' error. This is because the
         # symboliser occasionally throw this error when it shouldn't and succeeds on retry. It's not ideal that we have
         # to rely on the fault string, however.
-        if attempts < @data_required_error_retries && e.to_hash[:fault][:faultstring] == 'Data required for operation'
+        if attempts < @data_required_error_retries && data_required_fault?(e)
           retry
         end
 
-        raise Symgate::Error.from_savon(e)
+        raise Symgate::Error.from_savon(e, RequestObserver.consume_request_xml)
       end
+    end
+
+    def data_required_fault?(error)
+      error.to_hash[:fault][:faultstring] == 'Data required for operation'
+    rescue StandardError
+      false
     end
 
     def raise_error_on_string_response(response, response_type)

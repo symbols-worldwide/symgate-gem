@@ -1,11 +1,22 @@
+require 'yaml'
+
 class SymboliserConfig
-  def self.config
-    # Loading config from symboliser.yml and override with settings from local.yml
-    config = YAML.load_file(File.join(__dir__, 'symboliser.yml'))
-    local_file = File.join(__dir__, 'local.yml')
-    if File.exist?(local_file)
-      config.deep_merge!(YAML.load_file(local_file))
-    end
+  def self.config(directory = __dir__)
+    # Load symboliser.yml and override it with local.yml when that file is present.
+    config = YAML.load_file(File.join(directory, 'symboliser.yml'))
+    local_file = File.join(directory, 'local.yml')
+    config = deep_merge(config, YAML.load_file(local_file)) if File.exist?(local_file)
     config
   end
+
+  def self.deep_merge(base, overrides)
+    base.merge(overrides) do |_key, original, override|
+      if original.is_a?(Hash) && override.is_a?(Hash)
+        deep_merge(original, override)
+      else
+        override
+      end
+    end
+  end
+  private_class_method :deep_merge
 end

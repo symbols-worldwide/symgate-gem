@@ -115,9 +115,15 @@ RSpec.describe(Symgate::Client) do
            .returns(File.read('test/spec/fixtures/xml/access_denied.xml'))
 
       client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      response_xml = File.read('test/spec/fixtures/xml/access_denied.xml')
       expect { |b| client.savon_request(:enumerate_groups, &b) }.to raise_error do |e|
         expect(e).to be_a(Symgate::Error)
         expect(e.message).to include('Access denied')
+        expect(e.fault_string).to eq('Access denied')
+        expect(e.detail).to be_nil
+        expect(e.original_error).to be_a(Savon::SOAPFault)
+        expect(e.request_xml).to include('foo')
+        expect(e.response_xml).to eq(response_xml)
       end
     end
 
@@ -126,13 +132,83 @@ RSpec.describe(Symgate::Client) do
                                       %s(auth:key) => 'bar' } }
       savon.expects(:enumerate_groups)
            .with(message: message)
-           .returns(File.read('test/spec/fixtures/xml/data_required.xml'))
+           .returns(File.read('test/spec/fixtures/xml/fault_data_required.xml'))
       savon.expects(:enumerate_groups)
            .with(message: message)
            .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
 
       client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
       expect { client.savon_request(:enumerate_groups) }.not_to raise_error
+    end
+
+    it 'exposes the SOAP fault detail separately from the fault string' do
+      response_xml = File.read('test/spec/fixtures/xml/fault_with_detail.xml')
+      savon.expects(:enumerate_groups)
+           .with(message: { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                                %s(auth:key) => 'bar' } })
+           .returns(response_xml)
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      expect { |b| client.savon_request(:enumerate_groups, &b) }.to raise_error do |e|
+        expect(e.fault_string).to eq('Processing failed')
+        expect(e.detail).to eq('Provided credentials have expired')
+        expect(e.message).to include('Provided credentials have expired')
+        expect(e.response_xml).to eq(response_xml)
+      end
+    end
+
+    it 'retries a data required fault and returns the later response' do
+      fault_xml = File.read('test/spec/fixtures/xml/fault_data_required.xml')
+      success_xml = File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml')
+      message = { %s(auth:creds) => { %s(auth:account) => 'foo', %s(auth:key) => 'bar' } }
+
+      2.times do
+        savon.expects(:enumerate_groups).with(message: message).returns(fault_xml)
+      end
+      savon.expects(:enumerate_groups).with(message: message).returns(success_xml)
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      response = client.savon_request(:enumerate_groups)
+
+      expect(response).to be_a(Savon::Response)
+      expect(response.xml).to eq(success_xml)
+    end
+
+    it 'installs one request observer' do
+      client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+
+      observers = Savon.observers.select { |observer| observer.is_a?(Symgate::RequestObserver) }
+      expect(observers.length).to eq(1)
+    end
+  end
+
+  describe '#data_required_fault?' do
+    let(:client) { client_of_type(Symgate::Client, account: 'foo', key: 'bar') }
+
+    it 'matches the symboliser data required fault' do
+      payload = { fault: { faultstring: 'Data required for operation' } }
+      fault = Object.new
+      fault.define_singleton_method(:to_hash) { payload }
+
+      expect(client.send(:data_required_fault?, fault)).to eq(true)
+    end
+
+    it 'does not match a different fault' do
+      payload = { fault: { faultstring: 'Access denied' } }
+      fault = Object.new
+      fault.define_singleton_method(:to_hash) { payload }
+
+      expect(client.send(:data_required_fault?, fault)).to eq(false)
+    end
+
+    it 'does not match an unreadable fault' do
+      fault = Object.new
+      def fault.to_hash
+        raise StandardError, 'unparseable'
+      end
+
+      expect(client.send(:data_required_fault?, fault)).to eq(false)
     end
   end
 
