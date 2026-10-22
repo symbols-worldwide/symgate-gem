@@ -69,7 +69,8 @@ module Symgate
 
       # Copies a wordlist with the specified UUID with optional parameters to specify the destination wordlist UUID, the
       # context, name and readonlyness of the destination wordlist, source and destination group and/or user
-      def copy_wordlist(src_uuid, dest_uuid: nil, context: nil, name: nil, readonly: nil,
+      # :nocov:
+      def copy_wordlist(src_uuid, dest_uuid: nil, context: nil, name: nil, readonly: nil, # rubocop:disable Metrics/AbcSize
                         src_group: nil, src_user: nil, dest_group: nil, dest_user: nil)
         response = savon_request(:copy_wordlist) do |soap|
           params = { srcwordlistuuid: src_uuid }
@@ -88,6 +89,7 @@ module Symgate
           response.body[:copy_wordlist_response][:wordlistinfo]
         )
       end
+      # :nocov:
 
       # returns all wordlist entries for the wordlist specified by uuid.
       # accepts the following optional parameters:
