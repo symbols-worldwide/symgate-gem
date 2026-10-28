@@ -67,6 +67,60 @@ RSpec.describe(Symgate::Client) do
       expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
       expect(client.savon_client).to be_a(Savon::Client)
     end
+
+    it 'creates a valid client when called with an account, key, and user to impersonate' do
+      opts = { account: 'foo', key: 'bar', impersonate: 'group/user' }
+      client = nil
+      expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
+      expect(client.impersonate).to eq('group/user')
+    end
+
+    it 'throws a Symgate error when impersonation is requested without an account' do
+      expect { Symgate::Client.new(key: 'bar', impersonate: 'group/user') }.to raise_error(
+        Symgate::Error, 'No account specified'
+      )
+    end
+
+    it 'throws a Symgate error when impersonation is requested without a key or user' do
+      expect { client_of_type(Symgate::Client, account: 'foo', impersonate: 'group/user') }.to raise_error(
+        Symgate::Error, 'No key or user specified'
+      )
+    end
+
+    it 'creates a valid client when called with a user, password, and user to impersonate' do
+      opts = { account: 'foo', user: 'bar', password: 'baz', impersonate: 'group/other' }
+      client = nil
+      expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
+      expect(client.impersonate).to eq('group/other')
+    end
+
+    it 'creates a valid client when called with a user, token, and user to impersonate' do
+      opts = { account: 'foo', user: 'bar', token: 'baz', impersonate: 'group/other' }
+      client = nil
+      expect { client = client_of_type(Symgate::Client, opts) }.not_to raise_error
+      expect(client.impersonate).to eq('group/other')
+    end
+
+    it 'throws a Symgate error when impersonation is combined with a key and a user' do
+      opts = { account: 'foo', key: 'bar', user: 'baz', password: 'qux', impersonate: 'group/other' }
+      expect { client_of_type(Symgate::Client, opts) }.to raise_error(
+        Symgate::Error, 'Both key and user were specified'
+      )
+    end
+
+    it 'throws a Symgate error when impersonation is combined with a key and a password' do
+      opts = { account: 'foo', key: 'bar', password: 'baz', impersonate: 'group/user' }
+      expect { client_of_type(Symgate::Client, opts) }.to raise_error(
+        Symgate::Error, 'You must supply one of key, password or token'
+      )
+    end
+
+    it 'throws a Symgate error when impersonation is combined with a key and a token' do
+      opts = { account: 'foo', key: 'bar', token: 'baz', impersonate: 'group/user' }
+      expect { client_of_type(Symgate::Client, opts) }.to raise_error(
+        Symgate::Error, 'You must supply one of key, password or token'
+      )
+    end
   end
 
   describe '#savon_creds' do
@@ -94,6 +148,35 @@ RSpec.describe(Symgate::Client) do
                                                            } })
     end
 
+    it 'adds the account, key, and impersonated user to the hash, when specified' do
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar', impersonate: 'group/user')
+      expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
+                                                           %s(auth:key) => 'bar',
+                                                           %s(auth:impersonate) => 'group/user' })
+    end
+
+    it 'adds the user, password, and impersonated user to the hash, when specified' do
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'bar', password: 'baz',
+                                               impersonate: 'group/other')
+      expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
+                                                           %s(auth:user) => {
+                                                             %s(auth:id) => 'bar',
+                                                             %s(auth:password) => 'baz'
+                                                           },
+                                                           %s(auth:impersonate) => 'group/other' })
+    end
+
+    it 'adds the user, token, and impersonated user to the hash, when specified' do
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'bar', token: 'baz',
+                                               impersonate: 'group/other')
+      expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
+                                                           %s(auth:user) => {
+                                                             %s(auth:id) => 'bar',
+                                                             %s(auth:authtoken) => 'baz'
+                                                           },
+                                                           %s(auth:impersonate) => 'group/other' })
+    end
+
     it 'adds the user and token to the hash, when specified' do
       client = client_of_type(Symgate::Client, account: 'foo', user: 'bar', token: 'baz')
       expect(client.savon_creds).to eq(%s(auth:creds) => { %s(auth:account) => 'foo',
@@ -107,6 +190,47 @@ RSpec.describe(Symgate::Client) do
   describe '#savon_request' do
     before(:each) do
       Symgate::Client.send(:public, :savon_request)
+    end
+
+    it 'sends the impersonated user with the account and key' do
+      savon.expects(:enumerate_groups)
+           .with(message: { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                                %s(auth:key) => 'bar',
+                                                %s(auth:impersonate) => 'group/user' } })
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar', impersonate: 'group/user')
+      expect { client.savon_request(:enumerate_groups) }.not_to raise_error
+    end
+
+    it 'sends the impersonated user with the account, user, and password' do
+      savon.expects(:enumerate_groups)
+           .with(message: { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                                %s(auth:user) => {
+                                                  %s(auth:id) => 'group/admin',
+                                                  %s(auth:password) => 'baz'
+                                                },
+                                                %s(auth:impersonate) => 'group/user' } })
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
+
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'group/admin', password: 'baz',
+                                               impersonate: 'group/user')
+      expect { client.savon_request(:enumerate_groups) }.not_to raise_error
+    end
+
+    it 'sends the impersonated user with the account, user, and token' do
+      savon.expects(:enumerate_groups)
+           .with(message: { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                                %s(auth:user) => {
+                                                  %s(auth:id) => 'group/admin',
+                                                  %s(auth:authtoken) => 'baz'
+                                                },
+                                                %s(auth:impersonate) => 'group/user' } })
+           .returns(File.read('test/spec/fixtures/xml/enumerate_groups_empty.xml'))
+
+      client = client_of_type(Symgate::Client, account: 'foo', user: 'group/admin', token: 'baz',
+                                               impersonate: 'group/user')
+      expect { client.savon_request(:enumerate_groups) }.not_to raise_error
     end
 
     it 'fails when an unknown method is called' do
