@@ -1,5 +1,7 @@
 ## Unreleased
 
+Treat data_required_error_retries as the total number of attempts, including the first request
+
 Expose the SOAP fault string and the request and response XML on Symgate::Error
 
 Require Ruby 3.1.7 and update Savon to 2.17.5
