@@ -8,6 +8,10 @@ module Symgate
   module Wordlist
     # client for the Symgate wordlist system
     class Client < Symgate::Client
+      # Distinguishes an omitted scope from a scope the caller set to nil.
+      UNSET_SCOPE = Object.new
+      private_constant :UNSET_SCOPE
+
       # returns a list of wordlists available to the current user.
       # optionally, supply one or more wordlist contexts as a string or string array parameter
       # to only retrieve wordlist information about that context. e.g.:
@@ -27,12 +31,12 @@ module Symgate
 
       # creates a wordlist with the specified name, context and scope (see auth:scope).
       # optionally, supply a list of entries to form the wordlist's initial content
-      def create_wordlist(name, context, entries = [], readonly: false)
+      def create_wordlist(name, context, entries = [], readonly: false, scope: UNSET_SCOPE)
         tries ||= 3 # TODO: Find out if we still need to do this!
 
         Symgate::Wordlist::Info.from_soap(
           savon_request(:create_wordlist) do |soap|
-            soap.message(soap_params_for_create_wordlist(name, context, readonly, entries))
+            soap.message(soap_params_for_create_wordlist(name, context, readonly, entries, scope))
           end.body[:create_wordlist_response][:wordlistinfo]
         )
       rescue Symgate::Error => e
@@ -101,9 +105,7 @@ module Symgate
         check_for_multiple_opts(%i[match entry], opts)
 
         response = savon_request(:get_wordlist_entries) do |soap|
-          soap.message(wordlistid: uuid, getattachments: !!opts[:attachments])
-          soap[:message][:match] = { matchstring: opts[:match] } if opts.include? :match
-          soap[:message][:match] = { entryid: opts[:entry] } if opts.include? :entry
+          soap.message(message_for_get_wordlist_entries(uuid, opts))
         end
 
         Symgate::Client.savon_array(response.body[:get_wordlist_entries_response],
@@ -178,15 +180,21 @@ module Symgate
         end
       end
 
-      def soap_params_for_create_wordlist(name, context, readonly, entries)
-        {
-          name: name,
-          context: context,
-          scope: scope_for_context(context),
-          readonly: readonly
-        }.merge(
-          entries ? { %s(wl:wordlistentry) => entries.map(&:to_soap) } : {}
-        )
+      def message_for_get_wordlist_entries(uuid, opts)
+        message = { wordlistid: uuid }
+        message[:match] = { matchstring: opts[:match] } if opts.include?(:match)
+        message[:match] = { entryid: opts[:entry] } if opts.include?(:entry)
+        message[:getattachments] = !!opts[:attachments]
+        message
+      end
+
+      def soap_params_for_create_wordlist(name, context, readonly, entries, scope)
+        resolved_scope = scope.equal?(UNSET_SCOPE) ? scope_for_context(context) : scope
+        params = { context: context, name: name }
+        params[:scope] = resolved_scope unless resolved_scope.nil?
+        params[:readonly] = readonly
+        params[:'wl:wordlistentry'] = entries.map(&:to_soap) if entries
+        params
       end
     end
   end
