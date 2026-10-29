@@ -135,4 +135,58 @@ RSpec.describe(Symgate::Wordlist::Entry) do
     expect(e.to_s).to include('[2]')
     expect(e.to_s).to include('f7a23690-534a-0134-9ec1-20cf302b46f2')
   end
+
+  it 'serialises elements in schema order and omits a missing last change' do
+    entry = Symgate::Wordlist::Entry.new(
+      word: 'cat',
+      priority: 1,
+      uuid: 'f7a23690-534a-0134-9ec1-20cf302b46f2',
+      concept_code: '01234567890',
+      symbols: [Symgate::Cml::Symbol.new(main: 'foo.svg')],
+      custom_graphics: [
+        Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
+                                                 uuid: '4c1ef7d0-5357-0134-9ec1-20cf302b46f2',
+                                                 uri: 'model:cat.png')
+      ],
+      custom_nlp: [
+        Symgate::Wordlist::CustomNlp.new(base: 'cat', pos: 'NN', tags: 'sg', conceptcode: '01234567890')
+      ]
+    )
+
+    expect(entry.to_soap.keys).to eq(
+      %i[wl:word wl:priority wl:uuid wl:conceptcode cml:symbol
+         wl:customgraphic wl:customnlp]
+    )
+  end
+
+  it 'serialises last change after custom graphics when it is present' do
+    entry = Symgate::Wordlist::Entry.new(
+      word: 'cat',
+      priority: 1,
+      uuid: 'f7a23690-534a-0134-9ec1-20cf302b46f2',
+      last_change: DateTime.new(2012, 10, 10, 10, 10, 10, 0),
+      custom_nlp: [
+        Symgate::Wordlist::CustomNlp.new(base: 'cat', pos: 'NN', tags: '', conceptcode: '')
+      ]
+    )
+
+    expect(entry.to_soap.keys).to eq(
+      %i[wl:word wl:priority wl:uuid wl:lastchange wl:customnlp]
+    )
+  end
+
+  it 'reads one or more custom nlp values' do
+    entry = Symgate::Wordlist::Entry.from_soap(
+      word: 'cats',
+      priority: '2',
+      uuid: 'f7a23690-534a-0134-9ec1-20cf302b46f2',
+      customnlp: [
+        { base: 'cat', pos: 'NN', tags: 'sg', conceptcode: '1' },
+        { base: 'cat', pos: 'NN', tags: 'pl', conceptcode: '2' }
+      ]
+    )
+
+    expect(entry.custom_nlp.map(&:tags)).to eq(%w[sg pl])
+    expect(entry.custom_nlp.first.conceptcode).to eq('1')
+  end
 end

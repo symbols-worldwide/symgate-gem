@@ -76,5 +76,44 @@ RSpec.describe(Symgate::Wordlist::GraphicAttachment) do
                                                  data: k)
 
     expect(d.to_soap[:'wl:data']).to eq(Base64.encode64(k))
+    expect(d.to_soap).not_to have_key(:'wl:uri')
+  end
+
+  it 'serialises a uri instead of data when a uri is set' do
+    attachment = Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
+                                                          uuid: '7d18fe70-5342-0134-9ec0-20cf302b46f2',
+                                                          data: get_kitten,
+                                                          uri: 'model:cat.png')
+
+    expect(attachment.to_soap).to eq(%s(wl:type) => 'image/png',
+                                     %s(wl:uuid) => '7d18fe70-5342-0134-9ec0-20cf302b46f2',
+                                     %s(wl:uri) => 'model:cat.png')
+  end
+
+  it 'reads a uri from a soap hash' do
+    attachment = Symgate::Wordlist::GraphicAttachment.from_soap(
+      type: 'image/svg+xml',
+      uuid: '7d18fe70-5342-0134-9ec0-20cf302b46f2',
+      uri: 'model:cat.svg'
+    )
+
+    expect(attachment.uri).to eq('model:cat.svg')
+    expect(attachment.data).to be_nil
+  end
+
+  it 'describes an attachment that has a uri and no data' do
+    attachment = Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
+                                                          uuid: '7d18fe70-5342-0134-9ec0-20cf302b46f2',
+                                                          uri: 'model:cat.png')
+
+    expect(attachment.to_s).to include('model:cat.png')
+    expect(attachment.to_s).to include('image/png')
+  end
+
+  it 'describes an attachment with no data or uri' do
+    attachment = Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
+                                                          uuid: '7d18fe70-5342-0134-9ec0-20cf302b46f2')
+
+    expect(attachment.to_s).to include('no data')
   end
 end

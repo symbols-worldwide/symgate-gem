@@ -1,5 +1,7 @@
 ## Unreleased
 
+Match the PHP wordlist entry payload, including graphic URIs, custom NLP, and element order
+
 Add impersonation for account/key, user/password, and user/token credentials
 
 Treat data_required_error_retries as the total number of attempts, including the first request

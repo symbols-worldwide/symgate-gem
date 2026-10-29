@@ -2,6 +2,7 @@ require_relative '../../spec_helper.rb'
 
 require 'symgate/wordlist/client'
 require 'base64'
+require 'nokogiri'
 
 RSpec.describe(Symgate::Wordlist::Client) do
   describe '#enumerate_wordlists' do
@@ -339,6 +340,43 @@ RSpec.describe(Symgate::Wordlist::Client) do
       resp = client.create_wordlist('foo', 'User', readonly: true)
       expect(resp.readonly).to eq(true)
     end
+
+    it 'sends an explicit scope and can omit scope' do
+      savon.expects(:create_wordlist)
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            context: 'User',
+                            name: 'foo',
+                            scope: 'Account',
+                            readonly: false })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+      savon.expects(:create_wordlist)
+           .with(message: { %s(auth:creds) => test_user_password_creds,
+                            context: 'User',
+                            name: 'foo',
+                            readonly: false })
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      client.create_wordlist('foo', 'User', scope: 'Account')
+      expect(soap_child_names(Symgate::RequestObserver.consume_request_xml, 'createWordlistRequest'))
+        .to eq(%w[context name scope readonly creds])
+
+      client.create_wordlist('foo', 'User', scope: nil)
+      names = soap_child_names(Symgate::RequestObserver.consume_request_xml, 'createWordlistRequest')
+      expect(names).to eq(%w[context name readonly creds])
+    end
+
+    it 'sends create elements in schema order' do
+      savon.expects(:create_wordlist)
+           .with(message: :any)
+           .returns(File.read('test/spec/fixtures/xml/create_wordlist.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      client.create_wordlist('foo', 'Document')
+
+      expect(soap_child_names(Symgate::RequestObserver.consume_request_xml, 'createWordlistRequest'))
+        .to eq(%w[context name scope readonly creds])
+    end
   end
 
   describe '#destroy_wordlist' do
@@ -519,6 +557,18 @@ RSpec.describe(Symgate::Wordlist::Client) do
       expect(resp.first.custom_graphics.count).to eq(0)
     end
 
+    it 'sends the match before getattachments' do
+      savon.expects(:get_wordlist_entries)
+           .with(message: :any)
+           .returns(File.read('test/spec/fixtures/xml/get_wordlist_entries_one.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      client.get_wordlist_entries('6133cfec-0972-4c90-b952-6ab7d8304716', match: 'cat')
+
+      expect(soap_child_names(Symgate::RequestObserver.consume_request_xml, 'getWordlistEntriesRequest'))
+        .to eq(%w[wordlistid match getattachments creds])
+    end
+
     it 'raises an error if both a word and concept filter are supplied' do
       client = client_of_type(Symgate::Wordlist::Client, test_user_details)
 
@@ -614,6 +664,36 @@ RSpec.describe(Symgate::Wordlist::Client) do
           )
         )
       end.not_to raise_error
+    end
+
+    it 'sends an entry in schema order' do
+      savon.expects(:insert_wordlist_entry)
+           .with(message: :any)
+           .returns(File.read('test/spec/fixtures/xml/insert_wordlist_entry.xml'))
+
+      client = client_of_type(Symgate::Wordlist::Client, test_user_details)
+      client.insert_wordlist_entry(
+        '6133cfec-0972-4c90-b952-6ab7d8304716',
+        Symgate::Wordlist::Entry.new(
+          word: 'cat',
+          priority: 1,
+          uuid: '5fa23e93-6844-424a-9c4d-f694dec52869',
+          concept_code: '01234567890',
+          symbols: [Symgate::Cml::Symbol.new(main: 'foo.svg')],
+          custom_graphics: [
+            Symgate::Wordlist::GraphicAttachment.new(type: 'image/png',
+                                                     uuid: '76300f2a-c12e-40a7-9759-979e8453fe9d',
+                                                     uri: 'model:cat.png')
+          ],
+          last_change: DateTime.new(2012, 10, 10, 10, 10, 10, 0),
+          custom_nlp: [
+            Symgate::Wordlist::CustomNlp.new(base: 'cat', pos: 'NN', tags: 'sg', conceptcode: '01234567890')
+          ]
+        )
+      )
+
+      expect(soap_child_names(Symgate::RequestObserver.consume_request_xml, 'wordlistentry'))
+        .to eq(%w[word priority uuid conceptcode symbol customgraphic lastchange customnlp])
     end
 
     it 'throws an error if passed something other than a wordlist entry' do
@@ -835,4 +915,10 @@ RSpec.describe(Symgate::Wordlist::Client) do
     end
   end
   # :nocov:
+
+  def soap_child_names(xml, parent_name)
+    document = Nokogiri::XML(xml)
+    node = document.at_xpath("//*[local-name()='#{parent_name}']")
+    node.element_children.map { |child| child.name.split(':').last }
+  end
 end
