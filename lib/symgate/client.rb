@@ -16,6 +16,7 @@ module Symgate
       @wsdl = 'https://ws.widgitonline.com/schema/symboliser.wsdl'
       @endpoint = 'https://ws.widgitonline.com/'
       @savon_opts = {}
+      # Total attempts, including the first request. The default of 3 matches the PHP client.
       @data_required_error_retries = 3
       opts.each { |k, v| instance_variable_set("@#{k}", v) }
 
@@ -103,9 +104,8 @@ module Symgate
 
         r
       rescue Savon::SOAPFault => e
-        # Allow a configurable number of retries for a 'Data required for operation' error. This is because the
-        # symboliser occasionally throw this error when it shouldn't and succeeds on retry. It's not ideal that we have
-        # to rely on the fault string, however.
+        # data_required_error_retries is the total number of attempts, including this one.
+        # The symboliser occasionally throws this fault when it should not, and succeeds on a later attempt.
         if attempts < @data_required_error_retries && data_required_fault?(e)
           retry
         end

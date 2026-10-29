@@ -22,6 +22,12 @@ RSpec.describe(Symgate::Client) do
       )
     end
 
+    it 'allows three data required attempts by default' do
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+
+      expect(client.data_required_error_retries).to eq(3)
+    end
+
     it 'create a valid client if an account and key are specified' do
       client = nil
       expect { client = client_of_type(Symgate::Client, account: 'foo', key: 'bar') }.not_to raise_error
@@ -154,6 +160,76 @@ RSpec.describe(Symgate::Client) do
         expect(e.detail).to eq('Provided credentials have expired')
         expect(e.message).to include('Provided credentials have expired')
         expect(e.response_xml).to eq(response_xml)
+      end
+    end
+
+    it 'does not retry an expired credential fault' do
+      response_xml = File.read('test/spec/fixtures/xml/fault_with_detail.xml')
+      savon.expects(:enumerate_groups)
+           .with(message: { %s(auth:creds) => { %s(auth:account) => 'foo',
+                                                %s(auth:key) => 'bar' } })
+           .returns(response_xml)
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      expect { client.savon_request(:enumerate_groups) }.to raise_error do |e|
+        expect(e.fault_string).to eq('Processing failed')
+        expect(e.detail).to eq('Provided credentials have expired')
+        expect(e.response_xml).to eq(response_xml)
+      end
+    end
+
+    it 'raises the last data required fault after three attempts' do
+      fault_xml = File.read('test/spec/fixtures/xml/fault_data_required.xml')
+      last_fault_xml = fault_xml.sub('</faultstring>', '</faultstring><detail>final attempt</detail>')
+      message = { %s(auth:creds) => { %s(auth:account) => 'foo', %s(auth:key) => 'bar' } }
+
+      2.times do
+        savon.expects(:enumerate_groups).with(message: message).returns(fault_xml)
+      end
+      savon.expects(:enumerate_groups).with(message: message).returns(last_fault_xml)
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      expect { client.savon_request(:enumerate_groups) }.to raise_error do |e|
+        expect(e).to be_a(Symgate::Error)
+        expect(e.fault_string).to eq('Data required for operation')
+        expect(e.detail).to eq('final attempt')
+        expect(e.original_error).to be_a(Savon::SOAPFault)
+        expect(e.request_xml).to include('foo')
+        expect(e.response_xml).to eq(last_fault_xml)
+      end
+    end
+
+    it 'does not retry a data required fault when the attempt limit is 1' do
+      fault_xml = File.read('test/spec/fixtures/xml/fault_data_required.xml')
+      message = { %s(auth:creds) => { %s(auth:account) => 'foo', %s(auth:key) => 'bar' } }
+      savon.expects(:enumerate_groups).with(message: message).returns(fault_xml)
+
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      client.data_required_error_retries = 1
+
+      expect { client.savon_request(:enumerate_groups) }.to raise_error do |e|
+        expect(e.fault_string).to eq('Data required for operation')
+        expect(e.response_xml).to eq(fault_xml)
+      end
+    end
+
+    it 'does not retry an unreadable fault' do
+      client = client_of_type(Symgate::Client, account: 'foo', key: 'bar')
+      fault = Savon::SOAPFault.allocate
+      def fault.to_hash
+        raise StandardError, 'unparseable'
+      end
+
+      def fault.message
+        'SOAP request failed'
+      end
+
+      expect(client.savon_client).to receive(:call).once.and_raise(fault)
+
+      expect { client.savon_request(:enumerate_groups) }.to raise_error do |e|
+        expect(e).to be_a(Symgate::Error)
+        expect(e.message).to eq('SOAP request failed')
+        expect(e.original_error).to equal(fault)
       end
     end
 
