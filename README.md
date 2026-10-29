@@ -53,14 +53,31 @@ require 'symgate/auth'
 auth_client = Symgate::Auth::Client.new(account: 'my_account', key: 'secret')
 ```
 
+To act as another user, pass `impersonate`. It can follow an account and key, or a user with a password or token:
+
+```ruby
+auth_client = Symgate::Auth::Client.new(account: 'my_account',
+                                        key: 'secret',
+                                        impersonate: 'group/user')
+```
+
 #### User/password
 
 ```ruby
 require 'symgate/wordlist'
 
-wordlist_client = Symgate::Wordlist::Client.new(account: 'my_account', 
+wordlist_client = Symgate::Wordlist::Client.new(account: 'my_account',
                                                 user: 'group/user',
                                                 password: 'secret')
+```
+
+The same `impersonate` option works with a user and password:
+
+```ruby
+wordlist_client = Symgate::Wordlist::Client.new(account: 'my_account',
+                                                user: 'group/admin',
+                                                password: 'secret',
+                                                impersonate: 'group/user')
 ```
 
 #### User/token
@@ -86,6 +103,15 @@ end
 metadata_client = Symgate::Metadata::Client.new(account: 'my_account',
                                                 user: 'group/user',
                                                 token: token)
+```
+
+A stored session uses this form when it is impersonating another user:
+
+```ruby
+metadata_client = Symgate::Metadata::Client.new(account: 'my_account',
+                                                user: 'group/admin',
+                                                token: token,
+                                                impersonate: 'group/user')
 ```
 
 #### Other initialisation options

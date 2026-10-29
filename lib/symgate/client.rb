@@ -7,7 +7,7 @@ module Symgate
   # A generic client for the Symgate API.
   # See the WSDL for full documentation
   class Client
-    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key, :savon_opts,
+    attr_accessor :wsdl, :endpoint, :user, :password, :token, :account, :key, :impersonate, :savon_opts,
                   :data_required_error_retries
     attr_reader :savon_client
 
@@ -73,6 +73,7 @@ module Symgate
       creds = { %s(auth:account) => @account }
       creds[:'auth:key'] = @key if @key
       creds[:'auth:user'] = savon_user if @user
+      creds[:'auth:impersonate'] = @impersonate if @impersonate
 
       { %s(auth:creds) => creds }
     end
